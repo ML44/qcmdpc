@@ -30,13 +30,13 @@ endif
 
 all: qcmdpc$(suffix)
 
-qcmdpc$(suffix): qcmdpc_dec$(suffix).o qcmdpc$(suffix).o qcmdpc_main$(suffix).o misc.o
+qcmdpc$(suffix): qcmdpc_dec$(suffix).o qcmdpc$(suffix).o qcmdpc_attack$(suffix).o qcmdpc_main$(suffix).o misc.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 %$(suffix).o: %.c qcmdpc.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
-qcmdpc_main$(suffix).o qcmdpc_dec$(suffix).o: qcmdpc_dec.h
+qcmdpc_main$(suffix).o qcmdpc_dec$(suffix).o: qcmdpc_dec.h qcmdpc_attack.h
 qcmdpc_dec$(suffix).o: misc.h
 
 misc.o: misc.c
