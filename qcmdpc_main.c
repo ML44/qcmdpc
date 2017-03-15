@@ -107,18 +107,14 @@ int main(int argc, char ** argv) {
   */
 
   list_t l = list_init();
-  list_print(l, "vide");
-  if (list_isempty(l)) { printf("empty"); };
-
-  //qcblock_t h = qcblock_rand(10,2,myrnd);
-  //l = list_from_qcblock(h);
-  // list_print(l, "lh0");
+  list_print(l, "lh0");
   list_add(l, 4);
-  if (list_isempty(l)) { printf("empty3"); };
+  list_add(l, 5);
   list_print(l, "lh1");
   list_remove(l);
-  if (list_isempty(l)) { printf("empty4"); };
-  //list_print(l, "lh2");
+  list_print(l, "lh2");
+  list_remove(l);
+  list_print(l, "lh3");
   
   return 0;
 }

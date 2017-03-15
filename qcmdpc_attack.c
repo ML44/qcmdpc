@@ -240,11 +240,11 @@ void list_remove(list_t l) {
 void list_print(list_t l, char * str) {
   printf("%s = { ", str);
   node_t current = l->index;
-  if (current != NULL) {
+  while (current != NULL) {
     printf("%d ;", current->val);
-    //current = &((*current)->next);
+    current = current->next;
   }
-  printf(" }");
+  printf(" }\n");
 }
 
 list_t list_from_qcblock(qcblock_t h) {
