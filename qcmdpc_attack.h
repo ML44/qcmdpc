@@ -2,6 +2,16 @@
 
 #define qcsynd_set_coeff(synd, i) ((synd)->coeff[i] = 1)
 typedef uint32_t dist_count_t;
+struct node {
+  index_t val;
+  struct node * next;
+};
+typedef struct node * node_t;
+struct list {
+  int    weight;
+  node_t index;
+};
+typedef struct list * list_t;
 
 dist_count_t * dist_count_new(int length);
 qcsynd_t dist_spectre(qcblock_t e);
@@ -19,3 +29,10 @@ char dist_test(qcsynd_t s, qcblock_t k, int i);
 char dist_reconstruct_aux(qcsynd_t spectre, qcblock_t k, int w);
 void qcblock_add(qcblock_t k, int i);
 void qcblock_remove(qcblock_t k, int i);
+
+list_t list_init();
+char list_isempty(list_t l);
+void list_add(list_t l, index_t v);
+void list_remove(list_t l);
+void list_print(list_t l, char * str);
+list_t list_from_qcblock(qcblock_t h);

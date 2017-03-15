@@ -151,9 +151,9 @@ qcsynd_t dist_spectre_reconstruct(dist_count_t * counter, int p, int m) {
 /* Renvoie 0 si i dans k ou si il existe j dans k tel que la distance (j-i) n'est pas dans s */
 char dist_test(qcsynd_t s, qcblock_t k, int i) {
   int j;
-  for (j=0; j<qcblock_weight(h); ++j) {
+  for (j=0; j<qcblock_weight(k); ++j) {
     /* TODO TEST i dans k */
-    if !(qcsynd_coeff(i - qcblock_index(k,j))){ /* ABS VALUE */
+    if (!(qcsynd_coeff(s,i - qcblock_index(k,j)))){ /* ABS VALUE */
 	return 0;
       }
   }
@@ -162,12 +162,12 @@ char dist_test(qcsynd_t s, qcblock_t k, int i) {
 
 /* TODO ajouter le test dans dist_test sinon va fail */
 char dist_reconstruct_aux(qcsynd_t spectre, qcblock_t k, int w) {
-  if (qcblock_weight(k)==l) {
+  if (qcblock_weight(k)==w) {
     return 1;
   }
   else {
     int i;
-    for (i=0; i<qcsynd_length(s); ++i) {
+    for (i=0; i<qcsynd_length(spectre); ++i) {
       if (dist_test(spectre, k, i)) {
 	  qcblock_add(k, i);
 	  if (dist_reconstruct_aux(spectre, k, w)) {
@@ -205,8 +205,53 @@ void qcblock_remove(qcblock_t k, int i) {
   while (qcblock_index(k, j)!=i && j<qcblock_weight(k)){
     ++j;
   }
-  for (,j+1<qcblock_weight(k),++j) {
-    k->index[j] = k->index[j+1]
+  for (;j+1<qcblock_weight(k);++j) {
+    k->index[j] = k->index[j+1];
   }
   k->weight--;
+}
+
+list_t list_init() {
+  list_t l = malloc( sizeof ( struct list ) );
+  l->index = NULL;
+  l->weight=0;
+  return l;
+}
+
+char list_isempty(list_t l) {
+  if (l->index == NULL) {return 1;} return 0;
+}
+
+void list_add(list_t l, index_t v) {
+  node_t head = malloc(sizeof(node_t));
+  head->val = v;
+  head->next = l->index;
+  l->index = head;
+  l->weight++;
+}
+
+void list_remove(list_t l) {
+  if(l->weight>0) {
+    l->index = l->index->next;
+    l->weight--;
+  }
+}
+
+void list_print(list_t l, char * str) {
+  printf("%s = { ", str);
+  node_t current = l->index;
+  if (current != NULL) {
+    printf("%d ;", current->val);
+    //current = &((*current)->next);
+  }
+  printf(" }");
+}
+
+list_t list_from_qcblock(qcblock_t h) {
+  list_t l = list_init();
+  int j;
+  for (j=0;j<h->weight;++j) {
+    list_add(l, h->index[j]);
+  }
+  return l;
 }

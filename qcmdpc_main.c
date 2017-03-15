@@ -12,6 +12,7 @@ void mysrnd(int seed) { srandom(seed); }
 
 int main(int argc, char ** argv) {
 
+/*  
   int bl, bw, ind;
   // bl = BLOCK_LENGTH;
   // bw = BLOCK_WEIGHT;
@@ -92,6 +93,32 @@ int main(int argc, char ** argv) {
   qcsynd_free(spectre_e);
   qcsynd_free(spectre_h);
   dist_count_free(compteur);
-	
+*/
+
+
+  /*
+  qcblock_t h = qcblock_rand(10,2,myrnd);
+  qcblock_print(h, "h0");
+  qcblock_add(h, 1);
+  qcblock_print(h, "h1");
+  qcblock_remove(h, 1);
+  qcblock_print(h, "h2");
+  qcblock_free(h);
+  */
+
+  list_t l = list_init();
+  list_print(l, "vide");
+  if (list_isempty(l)) { printf("empty"); };
+
+  //qcblock_t h = qcblock_rand(10,2,myrnd);
+  //l = list_from_qcblock(h);
+  // list_print(l, "lh0");
+  list_add(l, 4);
+  if (list_isempty(l)) { printf("empty3"); };
+  list_print(l, "lh1");
+  list_remove(l);
+  if (list_isempty(l)) { printf("empty4"); };
+  //list_print(l, "lh2");
+  
   return 0;
 }
