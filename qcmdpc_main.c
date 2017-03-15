@@ -96,25 +96,15 @@ int main(int argc, char ** argv) {
 */
 
 
-  /*
-  qcblock_t h = qcblock_rand(10,2,myrnd);
+ 
+  qcblock_t h = qcblock_rand(10,4,myrnd);
   qcblock_print(h, "h0");
-  qcblock_add(h, 1);
-  qcblock_print(h, "h1");
-  qcblock_remove(h, 1);
-  qcblock_print(h, "h2");
-  qcblock_free(h);
-  */
+  qcsynd_t s = dist_spectre(h);
+  qcsynd_print(s, "sh");
+  list_t l = dist_reconstruct(s, 4);
+  list_print(l, "lh");
 
-  list_t l = list_init();
-  list_print(l, "lh0");
-  list_add(l, 4);
-  list_add(l, 5);
-  list_print(l, "lh1");
-  list_remove(l);
-  list_print(l, "lh2");
-  list_remove(l);
-  list_print(l, "lh3");
+/* TODO : reconversit list en qcblock et generer le spectre pour comparer */
   
   return 0;
 }

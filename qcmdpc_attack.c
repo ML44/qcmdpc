@@ -148,67 +148,40 @@ qcsynd_t dist_spectre_reconstruct(dist_count_t * counter, int p, int m) {
   return spectre;
 }
 
-/* Renvoie 0 si i dans k ou si il existe j dans k tel que la distance (j-i) n'est pas dans s */
-char dist_test(qcsynd_t s, qcblock_t k, int i) {
-  int j;
-  for (j=0; j<qcblock_weight(k); ++j) {
-    /* TODO TEST i dans k */
-    if (!(qcsynd_coeff(s,i - qcblock_index(k,j)))){ /* ABS VALUE */
-	return 0;
-      }
+char dist_test(qcsynd_t s, list_t lk, int i) {
+  node_t current = lk->index;
+  while (current != NULL) {
+    if (current->val == i || !(qcsynd_coeff(s, abs(current->val - i)-1 ))) {
+      return 0;
+    }
+    current = current->next;
   }
   return 1;
 }
 
-/* TODO ajouter le test dans dist_test sinon va fail */
-char dist_reconstruct_aux(qcsynd_t spectre, qcblock_t k, int w) {
-  if (qcblock_weight(k)==w) {
+char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w) {
+  if (list_weight(lk)==w) {
     return 1;
   }
   else {
     int i;
     for (i=0; i<qcsynd_length(spectre); ++i) {
-      if (dist_test(spectre, k, i)) {
-	  qcblock_add(k, i);
-	  if (dist_reconstruct_aux(spectre, k, w)) {
+      if (dist_test(spectre, lk, i)) {
+	  list_add(lk, i);
+	  if (dist_reconstruct_aux(spectre, lk, w)) {
 	    return 1;
 	  }
-	  qcblock_remove(k, i);
+	  list_remove(lk);
       }
     }
     return 0;
   }
 }
 
-/* Pas du tout efficace ... faire des linked lists */
-void qcblock_add(qcblock_t k, int i) {
-  int j=0;
-  int w = k->weight;
-  index_t * indexbis = (index_t *) malloc((w+1) * sizeof (index_t));
-  while (k->index[j]<i) {
-    indexbis[j]=k->index[j];
-    ++j;
-  }
-  indexbis[j]=i;
-  ++j;
-  while (j<w) {
-    indexbis[j+1]=k->index[j];
-    ++j;
-  }
-  k->index = indexbis;
-  k->weight++;
-}
-  
-
-void qcblock_remove(qcblock_t k, int i) {
-  int j=0;
-  while (qcblock_index(k, j)!=i && j<qcblock_weight(k)){
-    ++j;
-  }
-  for (;j+1<qcblock_weight(k);++j) {
-    k->index[j] = k->index[j+1];
-  }
-  k->weight--;
+list_t dist_reconstruct(qcsynd_t spectre, int w) {
+  list_t lk = list_init();
+  dist_reconstruct_aux(spectre, lk, w);
+  return lk;
 }
 
 list_t list_init() {
@@ -241,10 +214,10 @@ void list_print(list_t l, char * str) {
   printf("%s = { ", str);
   node_t current = l->index;
   while (current != NULL) {
-    printf("%d ;", current->val);
+    printf("%d ; ", current->val);
     current = current->next;
   }
-  printf(" }\n");
+  printf("}\n");
 }
 
 list_t list_from_qcblock(qcblock_t h) {

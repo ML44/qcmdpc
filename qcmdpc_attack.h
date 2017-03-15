@@ -25,11 +25,13 @@ void dist_count_free(dist_count_t (* counter));
 qcblock_t qcblock_or_noalloc(qcblock_t h, qcblock_t h0, qcblock_t h1);
 int dist_count_mean(dist_count_t * counter, int p);
 qcsynd_t dist_spectre_reconstruct(dist_count_t * counter, int p, int m);
-char dist_test(qcsynd_t s, qcblock_t k, int i);
-char dist_reconstruct_aux(qcsynd_t spectre, qcblock_t k, int w);
+char dist_test(qcsynd_t s, list_t k, int i);
+char dist_reconstruct_aux(qcsynd_t spectre, list_t k, int w);
+list_t dist_reconstruct(qcsynd_t spectre, int w);
 void qcblock_add(qcblock_t k, int i);
 void qcblock_remove(qcblock_t k, int i);
 
+#define list_weight(l) ((l)->weight)
 list_t list_init();
 char list_isempty(list_t l);
 void list_add(list_t l, index_t v);
