@@ -122,7 +122,7 @@ void qcsynd_compare(qcsynd_t s1, qcsynd_t s2, int l) {
 void qcblock_print(qcblock_t h, char * str) {
   int i;
   printf("%s = ", str);
-  for (i=0; i<qcblock_weight(h); i++) {
+  for (i=0; i<qcblock_weight(h); ++i) {
     printf("%d ; ", qcblock_index(h, i));
   }
   printf("\n");
@@ -131,7 +131,7 @@ void qcblock_print(qcblock_t h, char * str) {
 int dist_count_mean(dist_count_t * counter, int p) {
   unsigned long int m = 0;
   int i;
-  for (i=0; i<p; i++) {
+  for (i=0; i<p; ++i) {
     m += counter[i];
   }
   return m/p;
@@ -140,10 +140,73 @@ int dist_count_mean(dist_count_t * counter, int p) {
 qcsynd_t dist_spectre_reconstruct(dist_count_t * counter, int p, int m) {
   int i;
   qcsynd_t spectre = qcsynd_new(p-1);
-  for (i=0; i<p; i++) {
+  for (i=0; i<p; ++i) {
     if (counter[i]<m) {
 	qcsynd_set_coeff(spectre, i);
       }
   }
   return spectre;
+}
+
+/* Renvoie 0 si i dans k ou si il existe j dans k tel que la distance (j-i) n'est pas dans s */
+char dist_test(qcsynd_t s, qcblock_t k, int i) {
+  int j;
+  for (j=0; j<qcblock_weight(h); ++j) {
+    /* TODO TEST i dans k */
+    if !(qcsynd_coeff(i - qcblock_index(k,j))){ /* ABS VALUE */
+	return 0;
+      }
+  }
+  return 1;
+}
+
+/* TODO ajouter le test dans dist_test sinon va fail */
+char dist_reconstruct_aux(qcsynd_t spectre, qcblock_t k, int w) {
+  if (qcblock_weight(k)==l) {
+    return 1;
+  }
+  else {
+    int i;
+    for (i=0; i<qcsynd_length(s); ++i) {
+      if (dist_test(spectre, k, i)) {
+	  qcblock_add(k, i);
+	  if (dist_reconstruct_aux(spectre, k, w)) {
+	    return 1;
+	  }
+	  qcblock_remove(k, i);
+      }
+    }
+    return 0;
+  }
+}
+
+/* Pas du tout efficace ... faire des linked lists */
+void qcblock_add(qcblock_t k, int i) {
+  int j=0;
+  int w = k->weight;
+  index_t * indexbis = (index_t *) malloc((w+1) * sizeof (index_t));
+  while (k->index[j]<i) {
+    indexbis[j]=k->index[j];
+    ++j;
+  }
+  indexbis[j]=i;
+  ++j;
+  while (j<w) {
+    indexbis[j+1]=k->index[j];
+    ++j;
+  }
+  k->index = indexbis;
+  k->weight++;
+}
+  
+
+void qcblock_remove(qcblock_t k, int i) {
+  int j=0;
+  while (qcblock_index(k, j)!=i && j<qcblock_weight(k)){
+    ++j;
+  }
+  for (,j+1<qcblock_weight(k),++j) {
+    k->index[j] = k->index[j+1]
+  }
+  k->weight--;
 }
