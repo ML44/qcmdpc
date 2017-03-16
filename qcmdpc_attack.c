@@ -168,6 +168,7 @@ char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w) {
     return 1;
   }
   else {
+    //printf("%d - ",list_weight(lk));
     int i;
     for (i=0; i<qcsynd_length(spectre); ++i) {
       if (dist_test(spectre, lk, i)) {
@@ -183,15 +184,16 @@ char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w) {
 }
 
 qcblock_t dist_reconstruct(qcsynd_t spectre, int w) {
-  list_t lk = list_init();
+  list_t lk = list_init(qcsynd_length(spectre)+1);
   dist_reconstruct_aux(spectre, lk, w);
   return qcblock_from_list(lk);
 }
 
-list_t list_init() {
+list_t list_init(int len) {
   list_t l = malloc( sizeof ( struct list ) );
   l->index = NULL;
   l->weight=0;
+  l->length=len;
   return l;
 }
 
@@ -225,7 +227,7 @@ void list_print(list_t l, char * str) {
 }
 
 list_t list_from_qcblock(qcblock_t h) {
-  list_t l = list_init();
+  list_t l = list_init(h->length);
   int j;
   for (j=0;j<h->weight;++j) {
     list_add(l, h->index[j]);
@@ -233,8 +235,8 @@ list_t list_from_qcblock(qcblock_t h) {
   return l;
 }
 
-qcblock_t qcblock_from_list(list_t l, int length) {
-  qcblock_t h = qcblock_new(length, list_weight(l));
+qcblock_t qcblock_from_list(list_t l) {
+  qcblock_t h = qcblock_new(list_length(l), list_weight(l));
   node_t current = l->index;
   int i = list_weight(l)-1;
   while (current != NULL) {

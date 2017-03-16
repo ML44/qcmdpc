@@ -108,16 +108,21 @@ int main(int argc, char ** argv) {
 
   mysrnd(seed);
 
+
+/* TODO : Fix problem with dist_reconstruct (eg. 8 2 FAILS) */
+
+
   qcblock_t h = qcblock_rand(len,d,myrnd);
   qcblock_print(h, "h0");
   qcsynd_t s = dist_spectre(h);
   qcsynd_print(s, "sh");
   list_t l = dist_reconstruct(s, d);
   list_print(l, "lh");
-  qcblock_t h2 = qcblock_from_list(l,len);
+  qcblock_t h2 = qcblock_from_list(l);
   qcblock_print(h2, "h2");
   qcsynd_t s2 = dist_spectre(h2);
   qcsynd_print(s2, "sh2");
+
   
   
   return 0;

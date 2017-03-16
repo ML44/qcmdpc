@@ -8,6 +8,7 @@ struct node {
 };
 typedef struct node * node_t;
 struct list {
+  int    length;
   int    weight;
   node_t index;
 };
@@ -32,10 +33,11 @@ void qcblock_add(qcblock_t k, int i);
 void qcblock_remove(qcblock_t k, int i);
 
 #define list_weight(l) ((l)->weight)
-list_t list_init();
+#define list_length(l) ((l)->length)
+list_t list_init(int len);
 char list_isempty(list_t l);
 void list_add(list_t l, index_t v);
 void list_remove(list_t l);
 void list_print(list_t l, char * str);
 list_t list_from_qcblock(qcblock_t h);
-qcblock_t qcblock_from_list(list_t l, int length);
+qcblock_t qcblock_from_list(list_t l);
