@@ -149,13 +149,17 @@ qcsynd_t dist_spectre_reconstruct(dist_count_t * counter, int p, int m) {
 }
 
 char dist_test(qcsynd_t s, list_t lk, int i) {
+  /* printf("Test de - %d - dans ", i); */
+  /* list_print(s, ""); */
   node_t current = lk->index;
   while (current != NULL) {
     if (current->val == i || !(qcsynd_coeff(s, abs(current->val - i)-1 ))) {
+      /* printf(" : FAIL with %d\n", current->val); */
       return 0;
     }
     current = current->next;
   }
+  /* printf(" : SUCCESS\n"); */
   return 1;
 }
 
@@ -178,10 +182,10 @@ char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w) {
   }
 }
 
-list_t dist_reconstruct(qcsynd_t spectre, int w) {
+qcblock_t dist_reconstruct(qcsynd_t spectre, int w) {
   list_t lk = list_init();
   dist_reconstruct_aux(spectre, lk, w);
-  return lk;
+  return qcblock_from_list(lk);
 }
 
 list_t list_init() {
@@ -227,4 +231,16 @@ list_t list_from_qcblock(qcblock_t h) {
     list_add(l, h->index[j]);
   }
   return l;
+}
+
+qcblock_t qcblock_from_list(list_t l, int length) {
+  qcblock_t h = qcblock_new(length, list_weight(l));
+  node_t current = l->index;
+  int i = list_weight(l)-1;
+  while (current != NULL) {
+    qcblock_index(h, i) = current->val;
+    current = current->next;
+    --i;
+  }
+  return h;
 }

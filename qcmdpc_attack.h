@@ -27,7 +27,7 @@ int dist_count_mean(dist_count_t * counter, int p);
 qcsynd_t dist_spectre_reconstruct(dist_count_t * counter, int p, int m);
 char dist_test(qcsynd_t s, list_t k, int i);
 char dist_reconstruct_aux(qcsynd_t spectre, list_t k, int w);
-list_t dist_reconstruct(qcsynd_t spectre, int w);
+qcblock_t dist_reconstruct(qcsynd_t spectre, int w);
 void qcblock_add(qcblock_t k, int i);
 void qcblock_remove(qcblock_t k, int i);
 
@@ -38,3 +38,4 @@ void list_add(list_t l, index_t v);
 void list_remove(list_t l);
 void list_print(list_t l, char * str);
 list_t list_from_qcblock(qcblock_t h);
+qcblock_t qcblock_from_list(list_t l, int length);

@@ -96,15 +96,29 @@ int main(int argc, char ** argv) {
 */
 
 
- 
-  qcblock_t h = qcblock_rand(10,4,myrnd);
+  // arguments
+  int arg_count, len, d, seed;
+  arg_count = 0;
+  // longueur du bloc
+  len = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 10;
+  // poids du polynome h (d)
+  d = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 4; 
+  // random seed
+  seed = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
+
+  mysrnd(seed);
+
+  qcblock_t h = qcblock_rand(len,d,myrnd);
   qcblock_print(h, "h0");
   qcsynd_t s = dist_spectre(h);
   qcsynd_print(s, "sh");
-  list_t l = dist_reconstruct(s, 4);
+  list_t l = dist_reconstruct(s, d);
   list_print(l, "lh");
-
-/* TODO : reconversit list en qcblock et generer le spectre pour comparer */
+  qcblock_t h2 = qcblock_from_list(l,len);
+  qcblock_print(h2, "h2");
+  qcsynd_t s2 = dist_spectre(h2);
+  qcsynd_print(s2, "sh2");
+  
   
   return 0;
 }
