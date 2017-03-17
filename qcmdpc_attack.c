@@ -171,19 +171,26 @@ char dist_test(qcsynd_t s, list_t lk, int i) {
   return 1;
 }
 
-char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w) {
+/* recursively tries to construct a list (by extending lk) of weight w
+such that the spectrum of the list in included in spectre
+all bits < b have already been tested */
+char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w, int b) {
+  /* if (list_weight(lk)<8) { */
+  /*   printf("poids %d", list_weight(lk)); */
+  /*   list_print(lk, ""); */
+  /* } */
   if (list_weight(lk)==w) {
     /* printf("FINI ! ->"); */
     /* list_print(lk, "lkfinal"); */
     return 1;
   }
   else {
-    /* printf("\t poids %d - ",list_weight(lk)); */
+    /* printf("%d - ",list_weight(lk)); */
     int i;
-    for (i=0; i<qcsynd_length(spectre); ++i) {
+    for (i=b; i<qcsynd_length(spectre); ++i) {
       if (dist_test(spectre, lk, i)) {
 	  list_add(lk, i);
-	  if (dist_reconstruct_aux(spectre, lk, w)) {
+	  if (dist_reconstruct_aux(spectre, lk, w, i+1)) {
 	    return 1;
 	  }
 	  list_remove(lk);
@@ -196,7 +203,7 @@ char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w) {
 
 qcblock_t dist_reconstruct(qcsynd_t spectre, int w) {
   list_t lk = list_init(qcsynd_length(spectre)+1);
-  dist_reconstruct_aux(spectre, lk, w);
+  dist_reconstruct_aux(spectre, lk, w, 0);
   return qcblock_from_list(lk); 
 }
 
@@ -287,14 +294,14 @@ void test_reconstruct(int length, int weight, int seed) {
   qcsynd_t s2 = dist_spectre(h2);
   if (qcsynd_inclusion(s2,s)) {
     if (qcsynd_weight(s)==qcsynd_weight(s2)) { 
-      /* printf("EQUALITY \t");  */
+      printf("EQUALITY \t");
     }
     else {
-      /* printf("INCLUSION \t");  */
+      printf("INCLUSION \t");
     }
   }
   else {
-    /* printf("FAIL \t\t"); */
+    printf("FAIL \t\t");
   }
   /* qcsynd_print(s, "sh"); */
   /* qcsynd_print(s2, "sh2"); */

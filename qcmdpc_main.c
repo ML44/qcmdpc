@@ -110,14 +110,13 @@ int main(int argc, char ** argv) {
   int time_spent;
 
   for (i=0;i<seed;++i) {
+    printf("TEST %d : \t",i);
     time_begin = clock();
     test_reconstruct(len, d, i);
     time_end = clock();
     time_spent = (1000*(time_end - time_begin)) / CLOCKS_PER_SEC;
-    if (time_spent>10) {
-      printf("TEST %d : \t",i);
-      printf("time = %d ms \n", time_spent);
-    }
+    printf("time = %d ms \n", time_spent);
+    
   }
 
   
