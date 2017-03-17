@@ -1,50 +1,60 @@
 #include "qcmdpc.h"
 
+// Random
 long random(void);
 void srandom(unsigned int seed);
 int myrnd();
 void mysrnd(int seed);
 
+// Qcsynd
+void qcsynd_print(qcsynd_t s, char * str);
+void qcsynd_print2(qcsynd_t s1, qcsynd_t s2, int l);
+void qcsynd_compare(qcsynd_t s1, qcsynd_t s2, int l);
+void qcsynd_set_coeff(qcsynd_t s, int i);
+char qcsynd_inclusion(qcsynd_t s1, qcsynd_t s2);
+
+// Qcblock
+void qcblock_print(qcblock_t h, char * str);
+qcblock_t qcblock_or_noalloc(qcblock_t h, qcblock_t h0, qcblock_t h1);
+
+// Distance Counter
 typedef uint32_t dist_count_t;
 struct node {
   index_t val;
   struct node * next;
 };
+dist_count_t * dist_count_new(int length);
+void dist_count_print(dist_count_t (* counter), int p, char * str);
+void dist_count_free(dist_count_t (* counter));
+int dist_count_mean(dist_count_t * counter, int p);
+
+// Qclist
 typedef struct node * node_t;
-struct list {
+struct qclist {
   int    length;
   int    weight;
   node_t index;
 };
-typedef struct list * list_t;
+typedef struct qclist * qclist_t;
+#define qclist_weight(l) ((l)->weight)
+#define qclist_length(l) ((l)->length)
+qclist_t qclist_init(int len);
+char qclist_isempty(qclist_t l);
+void qclist_add(qclist_t l, index_t v);
+void qclist_remove(qclist_t l);
+void qclist_print(qclist_t l, char * str);
+qclist_t qclist_from_qcblock(qcblock_t h);
+qcblock_t qcblock_from_qclist(qclist_t l);
 
-dist_count_t * dist_count_new(int length);
-qcsynd_t dist_spectre(qcblock_t e);
-void dist_count_add_spectre(dist_count_t (* counter), qcsynd_t spectre, int ws);
-void dist_count_print(dist_count_t (* counter), int p, char * str);
-void qcsynd_print(qcsynd_t s, char * str);
-void qcsynd_print2(qcsynd_t s1, qcsynd_t s2, int l);
-void qcsynd_compare(qcsynd_t s1, qcsynd_t s2, int l);
-void qcblock_print(qcblock_t h, char * str);
-void dist_count_free(dist_count_t (* counter));
-qcblock_t qcblock_or_noalloc(qcblock_t h, qcblock_t h0, qcblock_t h1);
-int dist_count_mean(dist_count_t * counter, int p);
-qcsynd_t dist_spectre_reconstruct(dist_count_t * counter, int p, int m);
-char dist_test(qcsynd_t s, list_t k, int i);
-char dist_reconstruct_aux(qcsynd_t spectre, list_t k, int w, int b);
-qcblock_t dist_reconstruct(qcsynd_t spectre, int w);
-void qcblock_add(qcblock_t k, int i);
-void qcblock_remove(qcblock_t k, int i);
-void qcsynd_set_coeff(qcsynd_t s, int i);
+// Distance Spectrum
+qcsynd_t spectrum(qcblock_t e);
+void spectrum_add_to_counter(dist_count_t (* counter), qcsynd_t spectre, int ws);
+qcsynd_t spectrum_from_counter(dist_count_t * counter, int p, int m);
+char spectrum_test_new_bit(qcsynd_t s, qclist_t k, int i);
+char block_from_spectrum_aux(qcsynd_t spectre, qclist_t k, int w, int b);
+qcblock_t block_from_spectrum(qcsynd_t spectre, int w);
 
-#define list_weight(l) ((l)->weight)
-#define list_length(l) ((l)->length)
-list_t list_init(int len);
-char list_isempty(list_t l);
-void list_add(list_t l, index_t v);
-void list_remove(list_t l);
-void list_print(list_t l, char * str);
-list_t list_from_qcblock(qcblock_t h);
-qcblock_t qcblock_from_list(list_t l);
-void test_reconstruct(int length, int weight, int seed);
-char qcsynd_inclusion(qcsynd_t s1, qcsynd_t s2);
+// Test functions
+void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int seuil, int se, int sH);
+void test_block_reconstruction(int length, int weight, int seed);
+
