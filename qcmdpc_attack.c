@@ -10,11 +10,13 @@
 
 
 // -----------------------------------
+// new random generator
 // -----------------------------------
 int myrnd() { return random(); }
 
 
 // -----------------------------------
+// feeds random generator with seed
 // -----------------------------------
 void mysrnd(int seed) { srandom(seed); }
 
@@ -33,6 +35,7 @@ void mysrnd(int seed) { srandom(seed); }
 
 
 // -----------------------------------
+// prints the qcsynd with str prefix message
 // -----------------------------------
 void qcsynd_print(qcsynd_t s, char * str) {
   int i;
@@ -46,6 +49,7 @@ void qcsynd_print(qcsynd_t s, char * str) {
 
 
 // -----------------------------------
+// prints the l first values of two qcsynd side by side
 // -----------------------------------
 void qcsynd_print2(qcsynd_t s1, qcsynd_t s2, int l) {
   int i;
@@ -59,6 +63,7 @@ void qcsynd_print2(qcsynd_t s1, qcsynd_t s2, int l) {
 
 
 // -----------------------------------
+// compares the first l values of two qcsynd
 // -----------------------------------
 void qcsynd_compare(qcsynd_t s1, qcsynd_t s2, int l) {
   int i;
@@ -92,6 +97,7 @@ void qcsynd_compare(qcsynd_t s1, qcsynd_t s2, int l) {
 
 
 // -----------------------------------
+// sets to 1 the ith coef of s
 // -----------------------------------
 void qcsynd_set_coeff(qcsynd_t s, int i) {
   if (!(qcsynd_coeff(s,i))) {
@@ -102,6 +108,7 @@ void qcsynd_set_coeff(qcsynd_t s, int i) {
 
 
 // -----------------------------------
+// checks if s1 is included in s2
 // -----------------------------------
 char qcsynd_inclusion(qcsynd_t s1, qcsynd_t s2) {
   if (qcsynd_length(s1)!=qcsynd_length(s2)) {
@@ -131,6 +138,7 @@ char qcsynd_inclusion(qcsynd_t s1, qcsynd_t s2) {
 
 
 // -----------------------------------
+// prints the values of the qcblock with str prefix message
 // -----------------------------------
 void qcblock_print(qcblock_t h, char * str) {
   int i;
@@ -158,7 +166,7 @@ void qcblock_print(qcblock_t h, char * str) {
 
 
 // -----------------------------------
-// alloue un compteur de taille donnee
+// alocates a counter of given length
 // -----------------------------------
 dist_count_t * dist_count_new(int length) {
 	dist_count_t * counter;
@@ -170,6 +178,7 @@ dist_count_t * dist_count_new(int length) {
 
 
 // -----------------------------------
+// prints the values of the counter with str prefix message
 // -----------------------------------
 void dist_count_print(dist_count_t * counter, int p, char * str) {
   int i;
@@ -184,6 +193,7 @@ void dist_count_print(dist_count_t * counter, int p, char * str) {
 
 
 // -----------------------------------
+// frees the counter
 // -----------------------------------
 void dist_count_free(dist_count_t * counter) {
 	free(counter);
@@ -193,6 +203,7 @@ void dist_count_free(dist_count_t * counter) {
 
 
 // -----------------------------------
+// computes the mean of the counter
 // -----------------------------------
 int dist_count_mean(dist_count_t * counter, int p) {
   unsigned long int m = 0;
@@ -228,6 +239,7 @@ int dist_count_mean(dist_count_t * counter, int p) {
 
 
 // -----------------------------------
+// new empty qclist
 // -----------------------------------
 qclist_t qclist_init(int len) {
   qclist_t l = malloc( sizeof ( struct qclist ) );
@@ -240,6 +252,7 @@ qclist_t qclist_init(int len) {
 
 
 // -----------------------------------
+// tests if qclist is empty
 // -----------------------------------
 char qclist_isempty(qclist_t l) {
   if (l->index == NULL) {return 1;} return 0;
@@ -248,6 +261,7 @@ char qclist_isempty(qclist_t l) {
 
 
 // -----------------------------------
+// adds value v at the beginning of the qclist
 // -----------------------------------
 void qclist_add(qclist_t l, index_t v) {
   node_t head = malloc(sizeof(node_t));
@@ -260,6 +274,7 @@ void qclist_add(qclist_t l, index_t v) {
 
 
 // -----------------------------------
+// removes the first value of the qclist
 // -----------------------------------
 void qclist_remove(qclist_t l) {
   if(l->weight>0) {
@@ -271,6 +286,7 @@ void qclist_remove(qclist_t l) {
 
 
 // -----------------------------------
+// prints the qclist with str prefix message
 // -----------------------------------
 void qclist_print(qclist_t l, char * str) {
   printf("%s = { ", str);
@@ -285,6 +301,7 @@ void qclist_print(qclist_t l, char * str) {
 
 
 // -----------------------------------
+// translates a qcblock to a qclist
 // -----------------------------------
 qclist_t qclist_from_qcblock(qcblock_t h) {
   qclist_t l = qclist_init(h->length);
@@ -298,6 +315,7 @@ qclist_t qclist_from_qcblock(qcblock_t h) {
 
 
 // -----------------------------------
+// translates a qcblock to a qclist
 // -----------------------------------
 qcblock_t qcblock_from_qclist(qclist_t l) {
   qcblock_t h = qcblock_new(qclist_length(l), qclist_weight(l));
@@ -328,7 +346,7 @@ qcblock_t qcblock_from_qclist(qclist_t l) {
 
 
 // -----------------------------------
-// renvoie le spectre de distances de e
+// returns the distance spectrum of e
 // -----------------------------------
 qcsynd_t spectrum(qcblock_t e) {
   int p = qcblock_length(e);
@@ -351,14 +369,12 @@ qcsynd_t spectrum(qcblock_t e) {
 
 
 // -----------------------------------
-// ajoute la valeur ws a toutes les valeurs presentes dans le spectre de e
+// adds the value v to all the columns that appear in the spectrum of e
 // -----------------------------------
-void spectrum_add_to_counter(dist_count_t * counter, qcsynd_t spectre, int ws) {
-  int i;
-  
-  for (i = 0; i < qcsynd_length(spectre); ++i) {
-    if (qcsynd_coeff(spectre, i)) {
-      counter[i]+=ws;
+void spectrum_add_to_counter(dist_count_t * counter, qcsynd_t spectrum, int v) {
+  for (int i = 0; i < qcsynd_length(spectrum); ++i) {
+    if (qcsynd_coeff(spectrum, i)) {
+      counter[i]+=v;
     }
   }
 }
@@ -367,6 +383,8 @@ void spectrum_add_to_counter(dist_count_t * counter, qcsynd_t spectre, int ws) {
 
 
 // -----------------------------------
+// returns the spectrum of size p-1 containing all indices of the counter 
+// with values lower thant the threshold
 // -----------------------------------
 qcsynd_t spectrum_from_counter(dist_count_t * counter, int p, int threshold) {
   int i;
@@ -382,6 +400,7 @@ qcsynd_t spectrum_from_counter(dist_count_t * counter, int p, int threshold) {
 
 
 // -----------------------------------
+// tests if adding bit i to the list contradicts the spectrum
 // -----------------------------------
 char spectrum_test_new_bit(qcsynd_t s, qclist_t lk, int i) {
   /* printf("Test de - %d - dans ", i); */
@@ -437,11 +456,11 @@ char block_from_spectrum_aux(qcsynd_t spectre, qclist_t lk, int w, int b) {
 
 
 // -----------------------------------
+// returns a block whose spectrum in included in the input spectrum
 // -----------------------------------
-qcblock_t block_from_spectrum(qcsynd_t spectre, int w) {
-  qclist_t lk = qclist_init(qcsynd_length(spectre)+1);
-  /* qclist_add(lk, 0); */
-  block_from_spectrum_aux(spectre, lk, w, 0);
+qcblock_t block_from_spectrum(qcsynd_t spectrum, int w) {
+  qclist_t lk = qclist_init(qcsynd_length(spectrum)+1);
+  block_from_spectrum_aux(spectrum, lk, w, 0);
   return qcblock_from_qclist(lk); 
 }
 
@@ -469,7 +488,14 @@ qcblock_t block_from_spectrum(qcsynd_t spectre, int w) {
 
 
 
+
+
+
+
 // -----------------------------------
+// computes a counter with the syndroms of N errors
+// then reconstructs the block with the threshold (if mentioned)
+// or the mean
 // -----------------------------------
 void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int seuil, int se, int sH) {
   qcblock_t h, e = qcblock_new(0,0);
@@ -536,7 +562,12 @@ void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int seuil
 
 
 
+
+
+
 // -----------------------------------
+// computes the distance spectrum of a random block of given length and weight
+// then computes a block whose spectrum is included in this one
 // -----------------------------------
 void test_block_reconstruction(int length, int weight, int seed) {
   mysrnd(seed);
