@@ -1,6 +1,10 @@
 #include "qcmdpc.h"
 
-#define qcsynd_set_coeff(synd, i) ((synd)->coeff[i] = 1)
+long random(void);
+void srandom(unsigned int seed);
+int myrnd();
+void mysrnd(int seed);
+
 typedef uint32_t dist_count_t;
 struct node {
   index_t val;
@@ -31,6 +35,7 @@ char dist_reconstruct_aux(qcsynd_t spectre, list_t k, int w);
 qcblock_t dist_reconstruct(qcsynd_t spectre, int w);
 void qcblock_add(qcblock_t k, int i);
 void qcblock_remove(qcblock_t k, int i);
+void qcsynd_set_coeff(qcsynd_t s, int i);
 
 #define list_weight(l) ((l)->weight)
 #define list_length(l) ((l)->length)
@@ -41,3 +46,5 @@ void list_remove(list_t l);
 void list_print(list_t l, char * str);
 list_t list_from_qcblock(qcblock_t h);
 qcblock_t qcblock_from_list(list_t l);
+void test_reconstruct(int length, int weight, int seed);
+char qcsynd_inclusion(qcsynd_t s1, qcsynd_t s2);

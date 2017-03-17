@@ -1,5 +1,13 @@
 #include "qcmdpc_attack.h"
 
+
+// gestion de l'alea 
+long random(void);
+void srandom(unsigned int seed);
+int myrnd() { return random(); }
+void mysrnd(int seed) { srandom(seed); }
+
+
 // alloue un compteur de taille donnee
 dist_count_t * dist_count_new(int length) {
 	dist_count_t * counter;
@@ -12,7 +20,7 @@ qcsynd_t dist_spectre(qcblock_t e) {
   int p = qcblock_length(e);
   int w = qcblock_weight(e);
   qcsynd_t spectre = qcsynd_new(p-1);
-  int i, j, d1, d2, d;
+  int i, j, d1, d2;
   
   for (i=0; i<w-1; ++i) {
     for (j=i+1; j<w; ++j) {
@@ -150,7 +158,7 @@ qcsynd_t dist_spectre_reconstruct(dist_count_t * counter, int p, int m) {
 
 char dist_test(qcsynd_t s, list_t lk, int i) {
   /* printf("Test de - %d - dans ", i); */
-  /* list_print(s, ""); */
+  /* list_print(lk, ""); */
   node_t current = lk->index;
   while (current != NULL) {
     if (current->val == i || !(qcsynd_coeff(s, abs(current->val - i)-1 ))) {
@@ -165,10 +173,12 @@ char dist_test(qcsynd_t s, list_t lk, int i) {
 
 char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w) {
   if (list_weight(lk)==w) {
+    /* printf("FINI ! ->"); */
+    /* list_print(lk, "lkfinal"); */
     return 1;
   }
   else {
-    //printf("%d - ",list_weight(lk));
+    /* printf("\t poids %d - ",list_weight(lk)); */
     int i;
     for (i=0; i<qcsynd_length(spectre); ++i) {
       if (dist_test(spectre, lk, i)) {
@@ -179,6 +189,7 @@ char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w) {
 	  list_remove(lk);
       }
     }
+    /* printf("\t echec \n"); */
     return 0;
   }
 }
@@ -186,7 +197,7 @@ char dist_reconstruct_aux(qcsynd_t spectre, list_t lk, int w) {
 qcblock_t dist_reconstruct(qcsynd_t spectre, int w) {
   list_t lk = list_init(qcsynd_length(spectre)+1);
   dist_reconstruct_aux(spectre, lk, w);
-  return qcblock_from_list(lk);
+  return qcblock_from_list(lk); 
 }
 
 list_t list_init(int len) {
@@ -199,6 +210,13 @@ list_t list_init(int len) {
 
 char list_isempty(list_t l) {
   if (l->index == NULL) {return 1;} return 0;
+}
+
+void qcsynd_set_coeff(qcsynd_t s, int i) {
+  if (!(qcsynd_coeff(s,i))) {
+    (s)->coeff[i]=1;
+    (s)->weight+=1;
+  }
 }
 
 void list_add(list_t l, index_t v) {
@@ -245,4 +263,39 @@ qcblock_t qcblock_from_list(list_t l) {
     --i;
   }
   return h;
+}
+
+char qcsynd_inclusion(qcsynd_t s1, qcsynd_t s2) {
+  if (qcsynd_length(s1)!=qcsynd_length(s2)) {
+    return 0;
+  }
+  for (int i=0; i<qcsynd_length(s1);++i) {
+    if (qcsynd_coeff(s1,i)>qcsynd_coeff(s2,i)) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+void test_reconstruct(int length, int weight, int seed) {
+  mysrnd(seed);
+  qcblock_t h = qcblock_rand(length,weight,myrnd);
+  /* qcblock_print(h, "h0"); */
+  qcsynd_t s = dist_spectre(h);
+  qcblock_t h2 = dist_reconstruct(s, weight);
+  /* qcblock_print(h2, "h2"); */
+  qcsynd_t s2 = dist_spectre(h2);
+  if (qcsynd_inclusion(s2,s)) {
+    if (qcsynd_weight(s)==qcsynd_weight(s2)) { 
+      /* printf("EQUALITY \t");  */
+    }
+    else {
+      /* printf("INCLUSION \t");  */
+    }
+  }
+  else {
+    /* printf("FAIL \t\t"); */
+  }
+  /* qcsynd_print(s, "sh"); */
+  /* qcsynd_print(s2, "sh2"); */
 }

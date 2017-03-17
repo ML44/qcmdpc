@@ -2,13 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "qcmdpc_dec.h"
 #include "qcmdpc_attack.h"
 
-long random(void);
-void srandom(unsigned int seed);
-int myrnd() { return random(); }
-void mysrnd(int seed) { srandom(seed); }
 
 int main(int argc, char ** argv) {
 
@@ -106,24 +103,23 @@ int main(int argc, char ** argv) {
   // random seed
   seed = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
 
-  mysrnd(seed);
 
+  int i;
+  clock_t time_begin;
+  clock_t time_end;
+  int time_spent;
 
-/* TODO : Fix problem with dist_reconstruct (eg. 8 2 FAILS) */
+  for (i=0;i<seed;++i) {
+    time_begin = clock();
+    test_reconstruct(len, d, i);
+    time_end = clock();
+    time_spent = (1000*(time_end - time_begin)) / CLOCKS_PER_SEC;
+    if (time_spent>10) {
+      printf("TEST %d : \t",i);
+      printf("time = %d ms \n", time_spent);
+    }
+  }
 
-
-  qcblock_t h = qcblock_rand(len,d,myrnd);
-  qcblock_print(h, "h0");
-  qcsynd_t s = dist_spectre(h);
-  qcsynd_print(s, "sh");
-  list_t l = dist_reconstruct(s, d);
-  list_print(l, "lh");
-  qcblock_t h2 = qcblock_from_list(l);
-  qcblock_print(h2, "h2");
-  qcsynd_t s2 = dist_spectre(h2);
-  qcsynd_print(s2, "sh2");
-
-  
   
   return 0;
 }
