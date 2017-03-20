@@ -19,16 +19,16 @@ qcblock_t qcblock_or_noalloc(qcblock_t h, qcblock_t h0, qcblock_t h1);
 
 // Distance Counter
 typedef uint32_t dist_count_t;
-struct node {
-  index_t val;
-  struct node * next;
-};
 dist_count_t * dist_count_new(int length);
 void dist_count_print(dist_count_t (* counter), int p, char * str);
 void dist_count_free(dist_count_t (* counter));
 int dist_count_mean(dist_count_t * counter, int p);
 
 // Qclist
+struct node {
+  index_t val;
+  struct node * next;
+};
 typedef struct node * node_t;
 struct qclist {
   int    length;
@@ -48,7 +48,9 @@ qcblock_t qcblock_from_qclist(qclist_t l);
 
 // Distance Spectrum
 qcsynd_t spectrum(qcblock_t e);
-void spectrum_add_to_counter(dist_count_t (* counter), qcsynd_t spectre, int ws);
+void spectrum_add_to_counters(dist_count_t (* sweight_counter), 
+			      dist_count_t (* dist_freq_counter), 
+			      qcsynd_t spectre, int sw);
 qcsynd_t spectrum_from_counter(dist_count_t * counter, int p, int m);
 char spectrum_test_new_bit(qcsynd_t s, qclist_t k, int i);
 char block_from_spectrum_aux(qcsynd_t spectre, qclist_t k, int w, int b);
@@ -58,3 +60,5 @@ qcblock_t block_from_spectrum(qcsynd_t spectre, int w);
 void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int seuil, int se, int sH);
 void test_block_reconstruction(int length, int weight, int seed);
 
+// Write dat files
+void write_counts_to(dist_count_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, char* intro);

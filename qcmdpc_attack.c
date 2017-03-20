@@ -348,19 +348,19 @@ qcblock_t qcblock_from_qclist(qclist_t l) {
 // -----------------------------------
 // returns the distance spectrum of e
 // -----------------------------------
-qcsynd_t spectrum(qcblock_t e) {
+qcsynd_t spectrum(qcblock_t e) { 
+  // TODO2 multiplicite ? redef type
   int p = qcblock_length(e);
   int w = qcblock_weight(e);
-  qcsynd_t spectre = qcsynd_new(p-1);
-  int i, j, d1, d2;
+  qcsynd_t spectre = qcsynd_new(p/2);
+  int i, j, d1, d2, d;
   
   for (i=0; i<w-1; ++i) {
     for (j=i+1; j<w; ++j) {
       d1 = qcblock_index(e,j) - qcblock_index(e,i);
-      d2 = qcblock_length(e) - d1;
-      /* d = d1>=d2?d2:d1 ; */
-      qcsynd_set_coeff(spectre, d1-1);
-      qcsynd_set_coeff(spectre, d2-1);
+      d2 = p - d1;
+      d = d1>=d2?d2:d1 ;
+      if((spectre)->coeff[d-1]<4) { (spectre)->coeff[d-1]+=1; }
     }
   }
   return spectre;
@@ -371,10 +371,15 @@ qcsynd_t spectrum(qcblock_t e) {
 // -----------------------------------
 // adds the value v to all the columns that appear in the spectrum of e
 // -----------------------------------
-void spectrum_add_to_counter(dist_count_t * counter, qcsynd_t spectrum, int v) {
+void spectrum_add_to_counters(dist_count_t * sweight_counter, 
+			     dist_count_t * dist_freq_counter, 
+			     qcsynd_t spectrum, 
+			     int sw) 
+{
   for (int i = 0; i < qcsynd_length(spectrum); ++i) {
-    if (qcsynd_coeff(spectrum, i)) {
-      counter[i]+=v;
+    if (qcsynd_coeff(spectrum, i)>=1) {
+      dist_freq_counter[i]+=1;
+      sweight_counter[i]+=sw;
     }
   }
 }
@@ -498,64 +503,60 @@ qcblock_t block_from_spectrum(qcsynd_t spectrum, int w) {
 // or the mean
 // -----------------------------------
 void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int seuil, int se, int sH) {
-  qcblock_t h, e = qcblock_new(0,0);
-  qcsynd_t synd_e = qcsynd_new(0), spectre_e = qcsynd_new(0), 
-    spectre_h, spectre_h_reconstruct;
-  dist_count_t * compteur;
-  qcmdpc_t H;
-  int ws, m;
-  int ind = 1; // TODO adapter à plusieurs blocs
+  qcblock_t e = qcblock_new(0,0);
+  qcsynd_t synd_e = qcsynd_new(0), spectre_e = qcsynd_new(0);
+  int sw;
+  int ind = 1; // nbblocks
 
   printf("Nombre d'essais = %d, \nLongueur du vecteur = %d, \nPoids de l'erreur = %d, \nNombre de blocs = %d, \nTaille d'un bloc = %d, \nPoids de h = %d. \n", N, ind*p, t, ind, bl, bw);
+
+
+  // Creation of two counters
+  dist_count_t * dist_freq_counter = dist_count_new(p/2);
+  dist_count_t * sweight_counter = dist_count_new(p/2);
   
-  compteur = dist_count_new(p-1);
+  // Creation of the code
   mysrnd(sH);
-  H = qcmdpc_rand(bl, bw, myrnd);
+  qcmdpc_t H = qcmdpc_rand(bl, bw, myrnd);
   
-  while (--N) {
-    //printf("\n");
+  for (int i=0; i<N; ++i) {
+
+    // Generate a ciphertext
     mysrnd(se);
     e = qcblock_rand(ind * bl, t, myrnd);
     synd_e = qcmdpc_synd(H, e);
-    //qcblock_print(e, "e");
-    //qcsynd_print(synd_e, "s");
-    ws = qcsynd_weight(synd_e);
-    //printf("Poids de s : %d\n", ws);
+    sw = qcsynd_weight(synd_e);
+ 
+    // Compute spectrum
     spectre_e = spectrum(e);
-    //qcsynd_print(spectre_e, "spectre_e");
-    spectrum_add_to_counter(compteur, spectre_e, ws);
-    //dist_count_print(compteur, p-1, "compteur cumule");
+
+    // Add values to the counters
+    spectrum_add_to_counters(sweight_counter, dist_freq_counter, spectre_e, sw);
+
+    // Update seed
     se++;
   }
 
-  //printf("\n ======== \n");
+  dist_count_t * ratio_counter = dist_count_new(p/2);
+  for (int i=0; i<p/2; i++) {
+    if (dist_freq_counter[i]>0) {
+      ratio_counter[i] = sweight_counter[i] / dist_freq_counter[i];
+    }
+  }
 
-  //dist_count_print(compteur, p-1, "compteur cumule");
-  m = dist_count_mean(compteur, p-1);
-  seuil = (seuil == 0) ? m : seuil;
-  spectre_h_reconstruct = spectrum_from_counter(compteur, p-1, seuil);
-  //qcsynd_print(spectre_h_reconstruct, "spectre_h deduit");
-  
-  h = qcmdpc_block(H,0);
-  spectre_h = spectrum(h);
-  // TODO spectre cumule par bloc de h
-  // spectre_h_cum = qcsynd_new(h->length, 0).
-  //qcblock_print(h, "h");
-  //qcsynd_print(spectre_h, "spectre_h reel  ");
+  // print counters
+  /* dist_count_print(dist_freq_counter,p/2,"dist_freq"); */
+  /* dist_count_print(sweight_counter,p/2,"sweight"); */
 
-  printf("moyenne = %d\n", m);
-  printf("seuil = %d\n", seuil);
+  write_counts_to(ratio_counter, spectrum(qcmdpc_block(H,0)), p/2, "./dat/1.dat", " ratio_count h0");
 
-  //qcsynd_print2(spectre_h, spectre_h_reconstruct, p-1);
-  qcsynd_compare(spectre_h, spectre_h_reconstruct, p-1);
-  
-  // free
+  dist_count_free(dist_freq_counter);
+  dist_count_free(sweight_counter);
+  dist_count_free(ratio_counter);
+  qcmdpc_free(H);
   qcblock_free(e);
-  qcblock_free(h);
   qcsynd_free(synd_e);
   qcsynd_free(spectre_e);
-  qcsynd_free(spectre_h);
-  dist_count_free(compteur);
 }
 
 
@@ -590,4 +591,22 @@ void test_block_reconstruction(int length, int weight, int seed) {
   }
   qcsynd_print(s, "sh");
   qcsynd_print(s2, "sh2");
+}
+
+
+
+
+
+
+// -----------------------------------
+// Write counter and synd to dat file
+// -----------------------------------
+void write_counts_to(dist_count_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, char* intro) {
+   FILE *fp;
+   fp = fopen(path, "w+");
+   fprintf(fp, "#%s \n", intro);
+   for (int i=0; i<l; i++) {
+     fprintf(fp, "%d \t %d \t %d \n", i, ratio_counter[i], qcsynd_coeff(spectrum_h,i));
+   }
+   fclose(fp);  
 }

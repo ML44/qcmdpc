@@ -1,3 +1,4 @@
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,7 +11,7 @@
 int main(int argc, char ** argv) {
 
   
-/*
+
   // arguments
   int arg_count, N, p, t, se, sH, seuil, bl, bw;
   arg_count = 0;
@@ -31,8 +32,10 @@ int main(int argc, char ** argv) {
   sH = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
 
   test_spectrum_reconstruction(p, bl, bw, t, N, seuil, se, sH);
-*/
+  
 
+
+/*
   // arguments
   int arg_count, len, d, seed;
   arg_count = 0;
@@ -56,6 +59,7 @@ int main(int argc, char ** argv) {
     time_spent = (1000*(time_end - time_begin)) / CLOCKS_PER_SEC;
     printf("time = %d ms \n", time_spent);
   }
+*/
   
   return 0;
 }
