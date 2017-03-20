@@ -11,7 +11,7 @@ set ylabel 'synd\_weight'
 set xrange [0:2401]
 set yrange [1319:1325]
 
-set title "Average syndrom weight per distance (1 block, 10^9 tries)"
+set title "Average syndrom weight per distance (1 block, 10^6 tries)"
 
 set palette model RGB defined (0 "black", 1 "red", 2 "blue", 3 "green", 4 "pink")
 unset colorbox
