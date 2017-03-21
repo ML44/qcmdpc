@@ -13,25 +13,23 @@ int main(int argc, char ** argv) {
   
 
   // arguments
-  int arg_count, N, p, t, se, sH, seuil, bl, bw;
+  int arg_count, N, p, t, se, sH, bl, bw;
   arg_count = 0;
+  // nombre de tests
+  N = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1000;
   // longueur du bloc
-  p = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 10;
+  p = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 4801;
   bl = p;
   // poids du polynome h (d)
-  bw = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 4; 
+  bw = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 45; 
   // nombre d'erreurs (poids de e)
-  t = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 2; 
-  // nombre de tests
-  N = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 20;
-  // seuil (si 0, seuil = m la moyenne)
-  seuil = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 0; 
+  t = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 42; 
   // seed for e
   se = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
   // seed for H
   sH = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
 
-  test_spectrum_reconstruction(p, bl, bw, t, N, seuil, se, sH);
+  test_spectrum_reconstruction(p, bl, bw, t, N, se, sH);
   
 
 

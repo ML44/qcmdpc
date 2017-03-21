@@ -1,4 +1,8 @@
-# ratio_count h0 
+#Nombre d'essais = 1000000, 
+#Longueur du vecteur = 4801, 
+#Poids de l'erreur = 42, 
+#Taille d'un bloc = 4801, 
+#Poids de h = 45. 
 0 	 1323 	 1 
 1 	 1324 	 0 
 2 	 1324 	 0 

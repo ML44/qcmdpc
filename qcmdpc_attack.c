@@ -502,13 +502,11 @@ qcblock_t block_from_spectrum(qcsynd_t spectrum, int w) {
 // then reconstructs the block with the threshold (if mentioned)
 // or the mean
 // -----------------------------------
-void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int seuil, int se, int sH) {
+void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, int sH) {
   qcblock_t e = qcblock_new(0,0);
   qcsynd_t synd_e = qcsynd_new(0), spectre_e = qcsynd_new(0);
   int sw;
   int ind = 1; // nbblocks
-
-  printf("Nombre d'essais = %d, \nLongueur du vecteur = %d, \nPoids de l'erreur = %d, \nNombre de blocs = %d, \nTaille d'un bloc = %d, \nPoids de h = %d. \n", N, ind*p, t, ind, bl, bw);
 
 
   // Creation of two counters
@@ -548,7 +546,9 @@ void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int seuil
   /* dist_count_print(dist_freq_counter,p/2,"dist_freq"); */
   /* dist_count_print(sweight_counter,p/2,"sweight"); */
 
-  write_counts_to(ratio_counter, spectrum(qcmdpc_block(H,0)), p/2, "./dat/1.dat", " ratio_count h0");
+  write_counts_to(ratio_counter, spectrum(qcmdpc_block(H,0)), p/2, "./dat/1.dat", p, bl, bw, t, N);
+
+  call_gnuplot();
 
   dist_count_free(dist_freq_counter);
   dist_count_free(sweight_counter);
@@ -565,6 +565,37 @@ void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int seuil
 
 
 
+
+
+// -----------------------------------
+// Write counter and synd to dat file
+// -----------------------------------
+void write_counts_to(dist_count_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, int p, int bl, int bw, int t, int N) {
+   FILE *fp;
+   fp = fopen(path, "w+");
+
+   fprintf(fp, "#Nombre d'essais = %d, \n#Longueur du vecteur = %d, \n#Poids de l'erreur = %d, \n#Taille d'un bloc = %d, \n#Poids de h = %d. \n", N, p, t, bl, bw);
+
+
+   for (int i=0; i<l; i++) {
+     fprintf(fp, "%d \t %d \t %d \n", i, ratio_counter[i], qcsynd_coeff(spectrum_h,i));
+   }
+   fclose(fp);  
+}
+
+void call_gnuplot() {
+  system("gnuplot gnuplot-instructions.gnu > ./dat/1.png");
+
+  /* FILE * f; */
+  /* // Ouverture du shell et lancement de gnuplot */
+  /* f = popen("gnuplot gnuplot-instructions.gnu > %s" out, "w"); */
+  /* /\* // exécution de la commande gnuplot *\/ */
+  /* /\* fprintf(f, " plot \"toto.dat\" with lines\n"); *\/ */
+  /* /\* fflush(f); *\/ */
+  /* // terminer l'envoi de commandes et fermer gnuplot */
+  /* sleep(100); */
+  /* pclose(f); */
+}
 
 // -----------------------------------
 // computes the distance spectrum of a random block of given length and weight
@@ -596,17 +627,3 @@ void test_block_reconstruction(int length, int weight, int seed) {
 
 
 
-
-
-// -----------------------------------
-// Write counter and synd to dat file
-// -----------------------------------
-void write_counts_to(dist_count_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, char* intro) {
-   FILE *fp;
-   fp = fopen(path, "w+");
-   fprintf(fp, "#%s \n", intro);
-   for (int i=0; i<l; i++) {
-     fprintf(fp, "%d \t %d \t %d \n", i, ratio_counter[i], qcsynd_coeff(spectrum_h,i));
-   }
-   fclose(fp);  
-}
