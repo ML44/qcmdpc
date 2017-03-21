@@ -217,6 +217,54 @@ int dist_count_mean(dist_count_t * counter, int p) {
 
 
 
+// ********************************************************
+// ********************************************************
+
+// Distance Counter Float
+
+// ********************************************************
+// ********************************************************
+
+
+
+// -----------------------------------
+// alocates a counter of given length
+// -----------------------------------
+dist_count_float_t * dist_count_float_new(int length) {
+	dist_count_float_t * counter;
+	counter = (dist_count_float_t *) calloc(length, sizeof (dist_count_float_t));
+	return counter;
+}
+
+
+
+
+// -----------------------------------
+// prints the values of the counter with str prefix message
+// -----------------------------------
+void dist_count_float_print(dist_count_float_t * counter, int p, char * str) {
+  int i;
+  printf("%s = { ", str);
+  for (i=0; i<p; i++) {
+    printf("%f ; ", counter[i]);
+  }
+  printf("} \n");
+}
+
+
+
+
+// -----------------------------------
+// frees the counter
+// -----------------------------------
+void dist_count_float_free(dist_count_float_t * counter) {
+	free(counter);
+}
+
+
+
+
+
 
 
 
@@ -535,24 +583,32 @@ void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, i
     se++;
   }
 
-  dist_count_t * ratio_counter = dist_count_new(p/2);
+  dist_count_float_t * ratio_counter = dist_count_float_new(p/2); // pas des entiers !!!
   for (int i=0; i<p/2; i++) {
     if (dist_freq_counter[i]>0) {
-      ratio_counter[i] = sweight_counter[i] / dist_freq_counter[i];
+      ratio_counter[i] = ((long) sweight_counter[i]) / ((long) dist_freq_counter[i]);
     }
   }
 
   // print counters
-  /* dist_count_print(dist_freq_counter,p/2,"dist_freq"); */
+  dist_count_float_print(ratio_counter,p/2,"ratio_counter");
   /* dist_count_print(sweight_counter,p/2,"sweight"); */
 
-  write_counts_to(ratio_counter, spectrum(qcmdpc_block(H,0)), p/2, "./dat/1.dat", p, bl, bw, t, N);
+  qcsynd_t h_spectrum = spectrum(qcmdpc_block(H,0));
+  write_counts_to(ratio_counter, h_spectrum, p/2, "./dat/1.dat", p, bl, bw, t, N);
 
   call_gnuplot();
 
+  /* int s=0; */
+  /* for (int i=0;i<p/2;i++) { */
+  /*   s+=1324-ratio_counter[i]; */
+  /* } */
+  /* printf("nombre de distances dans le compteur (avec multiplicite) : %d\n", s); */
+
+
   dist_count_free(dist_freq_counter);
   dist_count_free(sweight_counter);
-  dist_count_free(ratio_counter);
+  dist_count_float_free(ratio_counter);
   qcmdpc_free(H);
   qcblock_free(e);
   qcsynd_free(synd_e);
@@ -570,7 +626,7 @@ void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, i
 // -----------------------------------
 // Write counter and synd to dat file
 // -----------------------------------
-void write_counts_to(dist_count_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, int p, int bl, int bw, int t, int N) {
+void write_counts_to(dist_count_float_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, int p, int bl, int bw, int t, int N) {
    FILE *fp;
    fp = fopen(path, "w+");
 
@@ -578,7 +634,7 @@ void write_counts_to(dist_count_t * ratio_counter, qcsynd_t spectrum_h, int l, c
 
 
    for (int i=0; i<l; i++) {
-     fprintf(fp, "%d \t %d \t %d \n", i, ratio_counter[i], qcsynd_coeff(spectrum_h,i));
+     fprintf(fp, "%d \t %f \t %d \n", i, ratio_counter[i], qcsynd_coeff(spectrum_h,i));
    }
    fclose(fp);  
 }

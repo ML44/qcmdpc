@@ -24,6 +24,12 @@ void dist_count_print(dist_count_t (* counter), int p, char * str);
 void dist_count_free(dist_count_t (* counter));
 int dist_count_mean(dist_count_t * counter, int p);
 
+// Distance Counter Float
+typedef float dist_count_float_t;
+dist_count_float_t * dist_count_float_new(int length);
+void dist_count_float_print(dist_count_float_t (* counter), int p, char * str);
+void dist_count_float_free(dist_count_float_t (* counter));
+
 // Qclist
 struct node {
   index_t val;
@@ -61,5 +67,5 @@ void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, i
 void test_block_reconstruction(int length, int weight, int seed);
 
 // Write dat files
-void write_counts_to(dist_count_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, int p, int bl, int bw, int t, int N);
+void write_counts_to(dist_count_float_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, int p, int bl, int bw, int t, int N);
 void call_gnuplot();
