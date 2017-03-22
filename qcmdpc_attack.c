@@ -583,15 +583,20 @@ void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, i
     se++;
   }
 
+
+  /* dist_count_print(dist_freq_counter, p/2, "freq"); */
+  /* dist_count_print(sweight_counter, p/2, "sweight"); */
+
   dist_count_float_t * ratio_counter = dist_count_float_new(p/2); // pas des entiers !!!
   for (int i=0; i<p/2; i++) {
     if (dist_freq_counter[i]>0) {
-      ratio_counter[i] = ((long) sweight_counter[i]) / ((long) dist_freq_counter[i]);
+      ratio_counter[i] = sweight_counter[i];
+      ratio_counter[i] /= dist_freq_counter[i];
     }
   }
 
   // print counters
-  dist_count_float_print(ratio_counter,p/2,"ratio_counter");
+  /* dist_count_float_print(ratio_counter,p/2,"ratio_counter"); */
   /* dist_count_print(sweight_counter,p/2,"sweight"); */
 
   qcsynd_t h_spectrum = spectrum(qcmdpc_block(H,0));
@@ -639,6 +644,9 @@ void write_counts_to(dist_count_float_t * ratio_counter, qcsynd_t spectrum_h, in
    fclose(fp);  
 }
 
+
+
+
 void call_gnuplot() {
   system("gnuplot gnuplot-instructions.gnu > ./dat/1.png");
 
@@ -652,6 +660,17 @@ void call_gnuplot() {
   /* sleep(100); */
   /* pclose(f); */
 }
+
+
+
+
+
+
+
+
+
+
+
 
 // -----------------------------------
 // computes the distance spectrum of a random block of given length and weight
