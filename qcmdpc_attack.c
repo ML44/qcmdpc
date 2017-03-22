@@ -541,6 +541,110 @@ qcblock_t block_from_spectrum(qcsynd_t spectrum, int w) {
 
 
 
+char is_in_dist(int d, qcblock_t b) {
+  qcsynd_t spectre = spectrum(b);
+  return qcsynd_coeff(spectre,d);
+}
+
+void stat_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH) { 
+  qcmdpc_t H = qcmdpc_new(); 
+  qcblock_t e = qcblock_new(0,0) ;
+  qcsynd_t s = qcsynd_new(0);
+  int ws_cum_0 = 0, ws_cum_1 = 0;
+  int N0 = 0, N1 = 0;
+
+  // Creation of the code
+  do {
+  mysrnd(sH);
+  H = qcmdpc_rand(p, wh, myrnd);
+  sH++;
+  } while (!(is_in_dist(d,qcmdpc_block(H,0))));
+
+  while (N0<N || N1<N) {
+
+    // Creation of the error
+    mysrnd(se);
+    e = qcblock_rand(p, we, myrnd);
+    se++;
+    // Computation of the syndrom weight
+    s = qcmdpc_synd(H, e);
+    
+    if (is_in_dist(d, e)) {
+      ws_cum_1 += qcsynd_weight(s);
+      N1++;
+    }
+    else {
+      ws_cum_0 += qcsynd_weight(s);
+      N0++;
+    }
+
+  }
+
+  float ratio_0 = ((float) ws_cum_0) / N0;
+  float ratio_1 = ((float) ws_cum_1) / N1;
+  
+  printf("sigma0 = %f \t N0 = %d \n", ratio_0, N0);
+  printf("sigma1 = %f \t N1 = %d \n", ratio_1, N1);
+
+  qcmdpc_free(H);
+  qcblock_free(e);
+  qcsynd_free(s);
+}
+
+
+
+void get_data_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH) { 
+  qcmdpc_t H = qcmdpc_new(); 
+  qcblock_t e = qcblock_new(0,0) ;
+  qcsynd_t s = qcsynd_new(0);
+  int ws = 0;
+  
+  // Creation of the code
+  do {
+  mysrnd(sH);
+  H = qcmdpc_rand(p, wh, myrnd);
+  sH++;
+  } while (!(is_in_dist(d,qcmdpc_block(H,0))));
+
+  dist_count_t * weight_counter = dist_count_new(p);
+
+  for (int i=0; i<N; i++) {
+
+    do {
+    // Creation of the error
+    mysrnd(se);
+    e = qcblock_rand(p, we, myrnd);
+    se++;
+    }
+    while (is_in_dist(d, e)) ;
+
+    // Computation of the syndrom weight
+    s = qcmdpc_synd(H, e);
+    ws = qcsynd_weight(s);
+    weight_counter[ws]+=1;
+
+  }
+
+
+   FILE *fp;
+   fp = fopen("./dat/2.dat", "w+");
+   fprintf(fp, "#Nombre d'essais = %d, \n#Longueur du vecteur = %d, \n#Poids de l'erreur = %d, \n#Poids de h = %d. \n", N, p, we, wh);
+
+   for (int i=0; i<p; i++) {
+     fprintf(fp, "%d \t %d \n", i, weight_counter[i]);
+   }
+   fclose(fp);  
+
+  qcmdpc_free(H);
+  qcblock_free(e);
+  qcsynd_free(s);
+  dist_count_free(weight_counter);
+}
+
+
+
+
+
 
 
 
@@ -584,7 +688,7 @@ void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, i
   }
 
 
-  /* dist_count_print(dist_freq_counter, p/2, "freq"); */
+  dist_count_print(dist_freq_counter, p/2, "freq");
   /* dist_count_print(sweight_counter, p/2, "sweight"); */
 
   dist_count_float_t * ratio_counter = dist_count_float_new(p/2); // pas des entiers !!!

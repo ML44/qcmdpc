@@ -66,6 +66,11 @@ qcblock_t block_from_spectrum(qcsynd_t spectre, int w);
 void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, int sH);
 void test_block_reconstruction(int length, int weight, int seed);
 
+char is_in_dist(int d, qcblock_t b);
+void stat_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH);
+
+void get_data_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH);
+
 // Write dat files
 void write_counts_to(dist_count_float_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, int p, int bl, int bw, int t, int N);
 void call_gnuplot();

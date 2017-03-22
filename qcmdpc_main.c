@@ -13,7 +13,7 @@ int main(int argc, char ** argv) {
   
 
   // arguments
-  int arg_count, N, p, t, se, sH, bl, bw;
+  int arg_count, N, p, t, se, sH, bl, bw, d;
   arg_count = 0;
   // nombre de tests
   N = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1000;
@@ -28,9 +28,11 @@ int main(int argc, char ** argv) {
   se = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
   // seed for H
   sH = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
+  // distance d
+  d = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
 
-  test_spectrum_reconstruction(p, bl, bw, t, N, se, sH);
-  
+  /* test_spectrum_reconstruction(p, bl, bw, t, N, se, sH); */
+  get_data_syndrom_weight(p, bw, t, d, N, se, sH);
 
 
 /*
