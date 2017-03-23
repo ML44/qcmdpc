@@ -598,6 +598,7 @@ void get_data_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH
   qcblock_t e = qcblock_new(0,0) ;
   qcsynd_t s = qcsynd_new(0);
   int ws = 0;
+  int N0 = 0, N1 = 0;
   
   // Creation of the code
   do {
@@ -606,39 +607,46 @@ void get_data_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH
   sH++;
   } while (!(is_in_dist(d,qcmdpc_block(H,0))));
 
-  dist_count_t * weight_counter = dist_count_new(p);
+  dist_count_t * weight_counter_0 = dist_count_new(p);
+  dist_count_t * weight_counter_1 = dist_count_new(p);
 
   for (int i=0; i<N; i++) {
 
-    do {
     // Creation of the error
     mysrnd(se);
     e = qcblock_rand(p, we, myrnd);
     se++;
-    }
-    while (is_in_dist(d, e)) ;
-
+    
     // Computation of the syndrom weight
     s = qcmdpc_synd(H, e);
     ws = qcsynd_weight(s);
-    weight_counter[ws]+=1;
-
+    
+    if (is_in_dist(d, e)) {
+      N1++;
+      weight_counter_1[ws]+=1; 
+    } 
+    else {
+      N0++;
+      weight_counter_0[ws]+=1; 
+    } 
   }
 
 
    FILE *fp;
    fp = fopen("./dat/2.dat", "w+");
-   fprintf(fp, "#Nombre d'essais = %d, \n#Longueur du vecteur = %d, \n#Poids de l'erreur = %d, \n#Poids de h = %d. \n", N, p, we, wh);
+   fprintf(fp, "#Nombre d'essais = %d, \n#Erreur ne contenant pas d (N0) = %d, \n#Erreur contenant d (N1) = %d, \n#Longueur du vecteur = %d, \n#Poids de l'erreur = %d, \n#Poids de h = %d. \n", N, N0, N1, p, we, wh);
 
-   for (int i=0; i<p; i++) {
-     fprintf(fp, "%d \t %d \n", i, weight_counter[i]);
+   for (int i=0; i<p/2; i++) {
+     fprintf(fp, "%d \t %f \t %f \n", i, (float) weight_counter_0[2*i] / N0, (float) weight_counter_1[2*i] / N1);
    }
    fclose(fp);  
 
   qcmdpc_free(H);
   qcblock_free(e);
   qcsynd_free(s);
-  dist_count_free(weight_counter);
+  dist_count_free(weight_counter_0);
+  dist_count_free(weight_counter_1);
+  system("gnuplot gnuplot-instructions2.gnu > ./dat/2.png");
 }
 
 
