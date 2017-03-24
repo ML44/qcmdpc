@@ -17,5 +17,14 @@ set palette model RGB defined (0 "black", 1 "red", 2 "blue", 3 "green", 4 "pink"
 unset colorbox
 set nokey 
 
+s0 = 1324
+delta = 0.6
+s(i) = s0 - i*delta
+
+#set arrow from 0,s(0) to 2400,s(0) nohead lt rgb "red"
+#set arrow from 0,s(1) to 2400,s(1) nohead lt rgb "red"
+#set arrow from 0,s(2) to 2400,s(2) nohead lt rgb "red"
+
+
 # Plot
 plot './dat/1.dat' using 1:2:3 pt 7 ps 0.5 palette

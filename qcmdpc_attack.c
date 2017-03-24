@@ -534,66 +534,21 @@ qcblock_t block_from_spectrum(qcsynd_t spectrum, int w) {
 // ********************************************************
 // ********************************************************
 
-// Test functions
+// Data functions
 
 // ********************************************************
 // ********************************************************
 
 
 
-char is_in_dist(int d, qcblock_t b) {
-  qcsynd_t spectre = spectrum(b);
-  return qcsynd_coeff(spectre,d);
-}
 
-void stat_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH) { 
-  qcmdpc_t H = qcmdpc_new(); 
-  qcblock_t e = qcblock_new(0,0) ;
-  qcsynd_t s = qcsynd_new(0);
-  int ws_cum_0 = 0, ws_cum_1 = 0;
-  int N0 = 0, N1 = 0;
-
-  // Creation of the code
-  do {
-  mysrnd(sH);
-  H = qcmdpc_rand(p, wh, myrnd);
-  sH++;
-  } while (!(is_in_dist(d,qcmdpc_block(H,0))));
-
-  while (N0<N || N1<N) {
-
-    // Creation of the error
-    mysrnd(se);
-    e = qcblock_rand(p, we, myrnd);
-    se++;
-    // Computation of the syndrom weight
-    s = qcmdpc_synd(H, e);
-    
-    if (is_in_dist(d, e)) {
-      ws_cum_1 += qcsynd_weight(s);
-      N1++;
-    }
-    else {
-      ws_cum_0 += qcsynd_weight(s);
-      N0++;
-    }
-
-  }
-
-  float ratio_0 = ((float) ws_cum_0) / N0;
-  float ratio_1 = ((float) ws_cum_1) / N1;
-  
-  printf("sigma0 = %f \t N0 = %d \n", ratio_0, N0);
-  printf("sigma1 = %f \t N1 = %d \n", ratio_1, N1);
-
-  qcmdpc_free(H);
-  qcblock_free(e);
-  qcsynd_free(s);
-}
-
-
-
-void get_data_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH) { 
+// -----------------------------------
+// Computes the syndrom weight distribution of a sample of N errors for a fixed
+// code h containing the distance d.
+// Two different cases : whether or not e contains distance d.
+// Generates the general distribution and the two subset distributions.
+// -----------------------------------
+void syndrom_weight_distribution(int p, int wh, int we, int d, int N, int se, int sH) { 
   qcmdpc_t H = qcmdpc_new(); 
   qcblock_t e = qcblock_new(0,0) ;
   qcsynd_t s = qcsynd_new(0);
@@ -605,7 +560,8 @@ void get_data_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH
   mysrnd(sH);
   H = qcmdpc_rand(p, wh, myrnd);
   sH++;
-  } while (!(is_in_dist(d,qcmdpc_block(H,0))));
+  } while (!(qcsynd_coeff(spectrum(qcmdpc_block(H,0)),d)));
+  /* } while (!(is_in_dist(d,qcmdpc_block(H,0)))); */
 
   dist_count_t * weight_counter_0 = dist_count_new(p);
   dist_count_t * weight_counter_1 = dist_count_new(p);
@@ -621,7 +577,7 @@ void get_data_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH
     s = qcmdpc_synd(H, e);
     ws = qcsynd_weight(s);
     
-    if (is_in_dist(d, e)) {
+    if (qcsynd_coeff(spectrum(e),d)) {
       N1++;
       weight_counter_1[ws]+=1; 
     } 
@@ -637,9 +593,31 @@ void get_data_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH
    fprintf(fp, "#Nombre d'essais = %d, \n#Erreur ne contenant pas d (N0) = %d, \n#Erreur contenant d (N1) = %d, \n#Longueur du vecteur = %d, \n#Poids de l'erreur = %d, \n#Poids de h = %d. \n", N, N0, N1, p, we, wh);
 
    for (int i=0; i<p/2; i++) {
-     fprintf(fp, "%d \t %f \t %f \n", i, (float) weight_counter_0[2*i] / N0, (float) weight_counter_1[2*i] / N1);
+     fprintf(fp, "%d \t %f \t %f \n", i, (float) weight_counter_0[2*i] / N, (float) weight_counter_1[2*i] / N);
    }
    fclose(fp);  
+
+   fp = fopen("./dat/3_0.dat", "w+");
+   fprintf(fp, "#Nombre d'essais = %d, \n#Erreur ne contenant pas d (N0) = %d, \n#Erreur contenant d (N1) = %d, \n#Longueur du vecteur = %d, \n#Poids de l'erreur = %d, \n#Poids de h = %d. \n", N, N0, N1, p, we, wh);
+
+   for (int i=0; i<p/2; i++) {
+     for (int k=0; k<weight_counter_0[2*i]; k++) {
+       fprintf(fp, "%d \n", i);
+     }
+   }
+   fclose(fp);  
+
+
+   fp = fopen("./dat/3_1.dat", "w+");
+   fprintf(fp, "#Nombre d'essais = %d, \n#Erreur ne contenant pas d (N0) = %d, \n#Erreur contenant d (N1) = %d, \n#Longueur du vecteur = %d, \n#Poids de l'erreur = %d, \n#Poids de h = %d. \n", N, N0, N1, p, we, wh);
+
+   for (int i=0; i<p/2; i++) {
+     for (int k=0; k<weight_counter_1[2*i]; k++) {
+       fprintf(fp, "%d \n", i);
+     }
+   }
+   fclose(fp);  
+
 
   qcmdpc_free(H);
   qcblock_free(e);
@@ -657,49 +635,61 @@ void get_data_syndrom_weight(int p, int wh, int we, int d, int N, int se, int sH
 
 
 
+
+// ********************************************************
+// ********************************************************
+
+// Test functions
+
+// ********************************************************
+// ********************************************************
+
+
+
+
+
+
+
 // -----------------------------------
-// computes a counter with the syndroms of N errors
-// then reconstructs the block with the threshold (if mentioned)
-// or the mean
+// For some code h, for each possible distance in the spectrum,
+// computes the averaged weight of syndroms of errors containing
+// this distance, over a sample of N errors
 // -----------------------------------
-void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, int sH) {
+void spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, int sH) {
   qcblock_t e = qcblock_new(0,0);
   qcsynd_t synd_e = qcsynd_new(0), spectre_e = qcsynd_new(0);
   int sw;
-  int ind = 1; // nbblocks
 
+  // Creation of the code
+  mysrnd(sH);
+  qcmdpc_t H = qcmdpc_rand(bl, bw, myrnd);
 
   // Creation of two counters
   dist_count_t * dist_freq_counter = dist_count_new(p/2);
   dist_count_t * sweight_counter = dist_count_new(p/2);
   
-  // Creation of the code
-  mysrnd(sH);
-  qcmdpc_t H = qcmdpc_rand(bl, bw, myrnd);
   
   for (int i=0; i<N; ++i) {
-
-    // Generate a ciphertext
+    // Generate an error
     mysrnd(se);
-    e = qcblock_rand(ind * bl, t, myrnd);
+    e = qcblock_rand(bl, t, myrnd);
+    
+    // Compute the syndrom and its weight
     synd_e = qcmdpc_synd(H, e);
     sw = qcsynd_weight(synd_e);
  
-    // Compute spectrum
+    // Compute the spectrum of e
     spectre_e = spectrum(e);
 
-    // Add values to the counters
+    // Add the weight to the values of the counters that are in the spectrum
     spectrum_add_to_counters(sweight_counter, dist_freq_counter, spectre_e, sw);
 
     // Update seed
     se++;
   }
 
-
-  dist_count_print(dist_freq_counter, p/2, "freq");
-  /* dist_count_print(sweight_counter, p/2, "sweight"); */
-
-  dist_count_float_t * ratio_counter = dist_count_float_new(p/2); // pas des entiers !!!
+  // compute the ratios
+  dist_count_float_t * ratio_counter = dist_count_float_new(p/2);
   for (int i=0; i<p/2; i++) {
     if (dist_freq_counter[i]>0) {
       ratio_counter[i] = sweight_counter[i];
@@ -707,76 +697,22 @@ void test_spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, i
     }
   }
 
-  // print counters
-  /* dist_count_float_print(ratio_counter,p/2,"ratio_counter"); */
-  /* dist_count_print(sweight_counter,p/2,"sweight"); */
+  // compute the spectrum of h
+  // is only used to check the correctness (here to give colors to the points)
+  qcsynd_t spectrum_h = spectrum(qcmdpc_block(H,0));
 
-  qcsynd_t h_spectrum = spectrum(qcmdpc_block(H,0));
-  write_counts_to(ratio_counter, h_spectrum, p/2, "./dat/1.dat", p, bl, bw, t, N);
-
-  call_gnuplot();
-
-  /* int s=0; */
-  /* for (int i=0;i<p/2;i++) { */
-  /*   s+=1324-ratio_counter[i]; */
-  /* } */
-  /* printf("nombre de distances dans le compteur (avec multiplicite) : %d\n", s); */
-
-
-  dist_count_free(dist_freq_counter);
-  dist_count_free(sweight_counter);
-  dist_count_float_free(ratio_counter);
-  qcmdpc_free(H);
-  qcblock_free(e);
-  qcsynd_free(synd_e);
-  qcsynd_free(spectre_e);
-}
-
-
-
-
-
-
-
-
-
-// -----------------------------------
-// Write counter and synd to dat file
-// -----------------------------------
-void write_counts_to(dist_count_float_t * ratio_counter, qcsynd_t spectrum_h, int l, char* path, int p, int bl, int bw, int t, int N) {
+  // write .dat file
    FILE *fp;
-   fp = fopen(path, "w+");
-
+   fp = fopen("./dat/1.dat", "w+");
    fprintf(fp, "#Nombre d'essais = %d, \n#Longueur du vecteur = %d, \n#Poids de l'erreur = %d, \n#Taille d'un bloc = %d, \n#Poids de h = %d. \n", N, p, t, bl, bw);
-
-
-   for (int i=0; i<l; i++) {
+   for (int i=0; i<p/2; i++) {
      fprintf(fp, "%d \t %f \t %d \n", i, ratio_counter[i], qcsynd_coeff(spectrum_h,i));
    }
    fclose(fp);  
-}
 
-
-
-
-void call_gnuplot() {
+  // call gnuplot
   system("gnuplot gnuplot-instructions.gnu > ./dat/1.png");
-
-  /* FILE * f; */
-  /* // Ouverture du shell et lancement de gnuplot */
-  /* f = popen("gnuplot gnuplot-instructions.gnu > %s" out, "w"); */
-  /* /\* // exécution de la commande gnuplot *\/ */
-  /* /\* fprintf(f, " plot \"toto.dat\" with lines\n"); *\/ */
-  /* /\* fflush(f); *\/ */
-  /* // terminer l'envoi de commandes et fermer gnuplot */
-  /* sleep(100); */
-  /* pclose(f); */
 }
-
-
-
-
-
 
 
 
@@ -788,7 +724,7 @@ void call_gnuplot() {
 // computes the distance spectrum of a random block of given length and weight
 // then computes a block whose spectrum is included in this one
 // -----------------------------------
-void test_block_reconstruction(int length, int weight, int seed) {
+void block_reconstruction(int length, int weight, int seed) {
   mysrnd(seed);
   qcblock_t h = qcblock_rand(length,weight,myrnd);
   qcblock_print(h, "h0");

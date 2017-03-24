@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,6 +16,12 @@ int main(int argc, char ** argv) {
   arg_count = 0;
   // nombre de tests
   N = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1000;
+  // seed for H
+  sH = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
+  // seed for e
+  se = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
+  // distance d
+  d = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
   // longueur du bloc
   p = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 4801;
   bl = p;
@@ -24,28 +29,12 @@ int main(int argc, char ** argv) {
   bw = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 45; 
   // nombre d'erreurs (poids de e)
   t = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 42; 
-  // seed for e
-  se = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
-  // seed for H
-  sH = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
-  // distance d
-  d = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
 
-  /* test_spectrum_reconstruction(p, bl, bw, t, N, se, sH); */
-  get_data_syndrom_weight(p, bw, t, d, N, se, sH);
+  /* spectrum_reconstruction(p, bl, bw, t, N, se, sH); */
+  syndrom_weight_distribution(p, bw, t, d, N, se, sH);
 
 
 /*
-  // arguments
-  int arg_count, len, d, seed;
-  arg_count = 0;
-  // longueur du bloc
-  len = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 10;
-  // poids du polynome h (d)
-  d = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 4; 
-  // random seed
-  seed = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
-
   int i;
   clock_t time_begin;
   clock_t time_end;
