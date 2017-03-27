@@ -63,9 +63,9 @@ char block_from_spectrum_aux(qcsynd_t spectre, qclist_t k, int w, int b);
 qcblock_t block_from_spectrum(qcsynd_t spectre, int w);
 
 // Data functions
-void syndrom_weight_distribution(int p, int wh, int we, int d, int N, int se, int sH);
+void syndrom_weight_distribution(int p, int w, int t, int d, int N, int se, int sh);
 
 // Reconstruction functions
-void spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, int sH);
+void spectrum_reconstruction(int p, int w, int t, int N, int se, int sh);
 void block_reconstruction(int length, int weight, int seed);
 

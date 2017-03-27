@@ -397,7 +397,6 @@ qcblock_t qcblock_from_qclist(qclist_t l) {
 // returns the distance spectrum of e
 // -----------------------------------
 qcsynd_t spectrum(qcblock_t e) { 
-  // TODO2 multiplicite ? redef type
   int p = qcblock_length(e);
   int w = qcblock_weight(e);
   qcsynd_t spectre = qcsynd_new(p/2);
@@ -655,14 +654,14 @@ void syndrom_weight_distribution(int p, int wh, int we, int d, int N, int se, in
 // computes the averaged weight of syndroms of errors containing
 // this distance, over a sample of N errors
 // -----------------------------------
-void spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, int sH) {
+void spectrum_reconstruction(int p, int w, int t, int N, int se, int sh) {
   qcblock_t e = qcblock_new(0,0);
   qcsynd_t synd_e = qcsynd_new(0), spectre_e = qcsynd_new(0);
   int sw;
 
   // Creation of the code
-  mysrnd(sH);
-  qcmdpc_t H = qcmdpc_rand(bl, bw, myrnd);
+  mysrnd(sh);
+  qcmdpc_t H = qcmdpc_rand(p, w, myrnd);
 
   // Creation of two counters
   dist_count_t * dist_freq_counter = dist_count_new(p/2);
@@ -672,7 +671,7 @@ void spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, int sH
   for (int i=0; i<N; ++i) {
     // Generate an error
     mysrnd(se);
-    e = qcblock_rand(bl, t, myrnd);
+    e = qcblock_rand(p, t, myrnd);
     
     // Compute the syndrom and its weight
     synd_e = qcmdpc_synd(H, e);
@@ -704,7 +703,7 @@ void spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, int sH
   // write .dat file
    FILE *fp;
    fp = fopen("./dat/1.dat", "w+");
-   fprintf(fp, "#Nombre d'essais = %d, \n#Longueur du vecteur = %d, \n#Poids de l'erreur = %d, \n#Taille d'un bloc = %d, \n#Poids de h = %d. \n", N, p, t, bl, bw);
+   fprintf(fp, "#Nombre d'essais = %d, \n#Poids de l'erreur = %d, \n#Taille d'un bloc = %d, \n#Poids de h = %d. \n", N, p, t, w);
    for (int i=0; i<p/2; i++) {
      fprintf(fp, "%d \t %f \t %d \n", i, ratio_counter[i], qcsynd_coeff(spectrum_h,i));
    }
@@ -724,27 +723,37 @@ void spectrum_reconstruction(int p, int bl, int bw, int t, int N, int se, int sH
 // computes the distance spectrum of a random block of given length and weight
 // then computes a block whose spectrum is included in this one
 // -----------------------------------
-void block_reconstruction(int length, int weight, int seed) {
-  mysrnd(seed);
-  qcblock_t h = qcblock_rand(length,weight,myrnd);
-  qcblock_print(h, "h0");
-  qcsynd_t s = spectrum(h);
-  qcblock_t h2 = block_from_spectrum(s, weight);
-  qcblock_print(h2, "h2");
-  qcsynd_t s2 = spectrum(h2);
-  if (qcsynd_inclusion(s2,s)) {
-    if (qcsynd_weight(s)==qcsynd_weight(s2)) { 
-      /* printf("EQUALITY \t"); */
+void block_reconstruction(int p, int w, int sh) {
+
+  // feed random generator
+  mysrnd(sh);
+  // generate h
+  qcblock_t h0 = qcblock_rand(p,w,myrnd);
+  qcblock_print(h0, "h0");
+  // compute its syndrom
+  qcsynd_t s0 = spectrum(h0);
+  qcsynd_print(s0, "s0");
+
+  // reconstruct a polynomial matching the spectrum
+  qcblock_t h1 = block_from_spectrum(s0, w);
+  qcblock_print(h1, "h1");
+  // compute its spectrum
+  qcsynd_t s1 = spectrum(h1);
+  qcsynd_print(s1, "s1");
+  
+  // test inclusion, equality
+  if (qcsynd_inclusion(s1,s0)) {
+    if (qcsynd_weight(s0)==qcsynd_weight(s1)) { 
+      printf("EQUALITY \t");
     }
     else {
-      /* printf("INCLUSION \t"); */
+      printf("INCLUSION \t");
     }
   }
   else {
-    /* printf("FAIL \t\t"); */
+    printf("FAIL \t\t");
   }
-  qcsynd_print(s, "sh");
-  qcsynd_print(s2, "sh2");
+  printf("\n");
 }
 
 
