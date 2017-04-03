@@ -1,7 +1,6 @@
 #Nombre d'essais = 100000, 
-#Longueur du vecteur = 4801, 
-#Poids de l'erreur = 42, 
-#Taille d'un bloc = 4801, 
+#Poids de l'erreur = 4801, 
+#Taille d'un bloc = 42, 
 #Poids de h = 45. 
 0 	 1323.346436 	 1 
 1 	 1324.013550 	 0 

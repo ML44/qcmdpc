@@ -730,7 +730,7 @@ void block_reconstruction(int p, int w, int sh) {
   // generate h
   qcblock_t h0 = qcblock_rand(p,w,myrnd);
   qcblock_print(h0, "h0");
-  // compute its syndrom
+  // compute its spectrum
   qcsynd_t s0 = spectrum(h0);
   qcsynd_print(s0, "s0");
 

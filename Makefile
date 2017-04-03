@@ -30,7 +30,7 @@ endif
 
 all: qcmdpc$(suffix)
 
-qcmdpc$(suffix): qcmdpc_dec$(suffix).o qcmdpc$(suffix).o qcmdpc_attack$(suffix).o qcmdpc_main$(suffix).o misc.o
+qcmdpc$(suffix): qcmdpc_dec$(suffix).o qcmdpc$(suffix).o qcmdpc_attack$(suffix).o qcmdpc_main$(suffix).o graph$(suffix).o nodeSet$(suffix).o findMaxClique$(suffix).o misc.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 %$(suffix).o: %.c qcmdpc.h
