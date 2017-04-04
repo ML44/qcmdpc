@@ -1,4 +1,5 @@
 #include "qcmdpc.h"
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 struct nodeSet {
   int N;
@@ -12,6 +13,7 @@ void nodeSet_free ( nodeSet_t ns );
 nodeSet_t nodeSet_init( int NInput );
 void nodeSet_add( nodeSet_t ns, int nodeA );
 void nodeSet_remove( nodeSet_t ns );
+
 
 
 // TODO changer les noms ?
@@ -29,7 +31,9 @@ void graph_free ( graph_t g );
 void graph_print ( graph_t g );
 char graph_areConnected( graph_t g, int nodeA, int nodeB ); // are two nodes connected?
 int graph_size( graph_t g );
-void graph_bkv2(graph_t g, int *old, int ne, int ce);
-void graph_findMaxClique( graph_t g );
+
+void graph_bkv2(graph_t g, int *old, int ne, int ce, qclist_list_t l);
+qclist_list_t graph_findMaxClique( graph_t g );
 
 void nodeSet_print( graph_t g, nodeSet_t ns );
+qclist_t nodeSet_to_list( graph_t g, nodeSet_t ns );

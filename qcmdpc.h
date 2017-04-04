@@ -1,18 +1,9 @@
-#ifndef QCV_H
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-
-//#define VERBOSE
+#include "lib.h"
 
 #ifndef INDEX
 #define INDEX 2
 #endif
 
-typedef uint16_t index_t; // limits the code length to 65536
-//typedef uint32_t index_t;
 
 // counter not likely to be > 255
 typedef uint8_t counter_t;
@@ -72,7 +63,3 @@ qcsynd_t qcmdpc_synd_adjust(qcsynd_t synd, qcmdpc_t H, qcblock_t e);
 qcsynd_t qcmdpc_synd(qcmdpc_t H, qcblock_t e);
 counter_t qcmdpc_counter(qcmdpc_t H, qcsynd_t synd, int j);
 counter_t * qcmdpc_count(qcmdpc_t H, qcsynd_t synd);
-
-#define QCV_H
-
-#endif

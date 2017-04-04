@@ -3,9 +3,9 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include "qcmdpc_dec.h"
-#include "qcmdpc_attack.h"
-#include "graph.h"
+/* #include "qcmdpc_dec.h" */
+/* #include "qcmdpc_attack.h" */
+#include "qcmdpc_reconstruct.h"
 
 
 
@@ -29,23 +29,33 @@ int main(int argc, char ** argv) {
   // poids du polynome h
   w = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 45; 
   // nombre d'erreurs (poids de e)
-  t = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 42; 
+  t = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 42;
 
-
-
+  // Creation of the code
   mysrnd(sh);
-  qcblock_t h = qcblock_rand(p,w,myrnd);
-  /* qcblock_print(h, "h"); */
-  qcsynd_t s = spectrum(h);
-  /* qcsynd_print(s, "s"); */
+  qcmdpc_t H = qcmdpc_rand(p, w, myrnd);
 
-  graph_t g = graph_new(h, s);
-  graph_print(g);
-  graph_findMaxClique(g);
+  // Observe the spectrum
+  float threshold = 1323.7;
+  qcsynd_t spectrum = observe_spectrum(H, p, w, t, N, se, threshold);
+
+  qclist_list_t candidates = dsr(spectrum, w);
+  qclist_list_print(candidates, "");
+  
 
 
 
+  /* mysrnd(sh); */
+  /* qcblock_t h = qcblock_rand(p,w,myrnd); */
+  /* /\* qcblock_print(h, "h"); *\/ */
+  /* qcsynd_t s = spectrum(h); */
+  /* /\* qcsynd_print(s, "s"); *\/ */
 
+  /* graph_t g = graph_new(h, s); */
+  /* graph_print(g); */
+  /* qclist_list_t l = graph_findMaxClique(g); */
+  /* qclist_list_print(l, "result"); */
+  
 
   /* spectrum_reconstruction(p, w, t, N, se, sh); */
   /* syndrom_weight_distribution(p, w, t, d, N, se, sh); */

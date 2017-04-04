@@ -274,8 +274,6 @@ void dist_count_float_free(dist_count_float_t * counter) {
 
 
 
-
-
 // ********************************************************
 // ********************************************************
 
@@ -285,66 +283,6 @@ void dist_count_float_free(dist_count_float_t * counter) {
 // ********************************************************
 
 
-
-// -----------------------------------
-// new empty qclist
-// -----------------------------------
-qclist_t qclist_init(int len) {
-  qclist_t l = malloc( sizeof ( struct qclist ) );
-  l->index = NULL;
-  l->weight=0;
-  l->length=len;
-  return l;
-}
-
-
-
-// -----------------------------------
-// tests if qclist is empty
-// -----------------------------------
-char qclist_isempty(qclist_t l) {
-  if (l->index == NULL) {return 1;} return 0;
-}
-
-
-
-// -----------------------------------
-// adds value v at the beginning of the qclist
-// -----------------------------------
-void qclist_add(qclist_t l, index_t v) {
-  node_t head = malloc(sizeof(node_t));
-  head->val = v;
-  head->next = l->index;
-  l->index = head;
-  l->weight++;
-}
-
-
-
-// -----------------------------------
-// removes the first value of the qclist
-// -----------------------------------
-void qclist_remove(qclist_t l) {
-  if(l->weight>0) {
-    l->index = l->index->next;
-    l->weight--;
-  }
-}
-
-
-
-// -----------------------------------
-// prints the qclist with str prefix message
-// -----------------------------------
-void qclist_print(qclist_t l, char * str) {
-  printf("%s = { ", str);
-  node_t current = l->index;
-  while (current != NULL) {
-    printf("%d ; ", current->val);
-    current = current->next;
-  }
-  printf("}\n");
-}
 
 
 
@@ -363,7 +301,7 @@ qclist_t qclist_from_qcblock(qcblock_t h) {
 
 
 // -----------------------------------
-// translates a qcblock to a qclist
+// translates a qclist to a qcblock
 // -----------------------------------
 qcblock_t qcblock_from_qclist(qclist_t l) {
   qcblock_t h = qcblock_new(qclist_length(l), qclist_weight(l));
@@ -438,10 +376,9 @@ void spectrum_add_to_counters(dist_count_t * sweight_counter,
 // returns the spectrum of size p-1 containing all indices of the counter 
 // with values lower thant the threshold
 // -----------------------------------
-qcsynd_t spectrum_from_counter(dist_count_t * counter, int p, int threshold) {
-  int i;
+qcsynd_t spectrum_from_counter(dist_count_float_t * counter, int p, float threshold) {
   qcsynd_t spectre = qcsynd_new(p-1);
-  for (i=0; i<p; ++i) {
+  for (int i=0; i<p; ++i) {
     if (counter[i]<threshold) {
 	qcsynd_set_coeff(spectre, i);
       }
@@ -514,6 +451,19 @@ qcblock_t block_from_spectrum(qcsynd_t spectrum, int w) {
   qclist_t lk = qclist_init(qcsynd_length(spectrum)+1);
   block_from_spectrum_aux(spectrum, lk, w, 0);
   return qcblock_from_qclist(lk); 
+}
+
+
+// -----------------------------------
+// returns the distance between i and j with symetry of size p
+// -----------------------------------
+int spectrum_dist( int i, int j, int p) {
+  if (j>i) {
+    return MIN(j-i,p-(j-i));
+  }
+  else {
+    return MIN(i-j,p-(i-j));
+  }
 }
 
 
@@ -758,4 +708,72 @@ void block_reconstruction(int p, int w, int sh) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+qcsynd_t observe_spectrum(qcmdpc_t H, int p, int w, int t, int N, int se, float threshold) {
+  qcblock_t e = qcblock_new(0,0);
+  qcsynd_t synd_e = qcsynd_new(0), spectre_e = qcsynd_new(0);
+  int sw;
+
+  
+  // Creation of two counters
+  dist_count_t * dist_freq_counter = dist_count_new(p/2);
+  dist_count_t * sweight_counter = dist_count_new(p/2);
+  
+  
+  for (int i=0; i<N; ++i) {
+    // Generate an error
+    mysrnd(se);
+    e = qcblock_rand(p, t, myrnd);
+    
+    // Compute the syndrom and its weight
+    synd_e = qcmdpc_synd(H, e);
+    sw = qcsynd_weight(synd_e);
+ 
+    // Compute the spectrum of e
+    spectre_e = spectrum(e);
+
+    // Add the weight to the values of the counters that are in the spectrum
+    spectrum_add_to_counters(sweight_counter, dist_freq_counter, spectre_e, sw);
+
+    // Update seed
+    se++;
+  }
+
+  // compute the ratios
+  dist_count_float_t * ratio_counter = dist_count_float_new(p/2);
+  for (int i=0; i<p/2; i++) {
+    if (dist_freq_counter[i]>0) {
+      ratio_counter[i] = sweight_counter[i];
+      ratio_counter[i] /= dist_freq_counter[i];
+    }
+  }
+
+  // compute the (hypothetical) spectrum of h
+  qcsynd_t spectrum_h = spectrum_from_counter(ratio_counter, p/2, threshold);
+
+  // write .dat file
+   FILE *fp;
+   fp = fopen("./dat/1.dat", "w+");
+   fprintf(fp, "#Nombre d'essais = %d, \n#Poids de l'erreur = %d, \n#Taille d'un bloc = %d, \n#Poids de h = %d. \n", N, p, t, w);
+   for (int i=0; i<p/2; i++) {
+     fprintf(fp, "%d \t %f \t %d \n", i, ratio_counter[i], qcsynd_coeff(spectrum_h,i));
+   }
+   fclose(fp);  
+
+  // call gnuplot
+  system("gnuplot gnuplot-instructions.gnu > ./dat/1.png");
+
+  return spectrum_h;
+}
 
