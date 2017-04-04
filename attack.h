@@ -1,10 +1,5 @@
 #include "qcmdpc_graph.h"
 
-// Random
-long random(void);
-void srandom(unsigned int seed);
-int myrnd();
-void mysrnd(int seed);
 
 // Qcsynd
 void qcsynd_print(qcsynd_t s, char * str);

@@ -5,7 +5,8 @@
 #include <time.h>
 /* #include "qcmdpc_dec.h" */
 /* #include "qcmdpc_attack.h" */
-#include "qcmdpc_reconstruct.h"
+/* #include "qcmdpc_reconstruct.h" */
+#include "qcmdpc.h"
 
 
 
@@ -31,16 +32,26 @@ int main(int argc, char ** argv) {
   // nombre d'erreurs (poids de e)
   t = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 42;
 
-  // Creation of the code
-  mysrnd(sh);
-  qcmdpc_t H = qcmdpc_rand(p, w, myrnd);
+  
+  printf("%d\n", spectral_dist(N, sh, se));
+  
+  
+  qcblock_t b = qcblock_new(10,3);
+  sparse_vect_free(b);
+  
 
-  // Observe the spectrum
-  float threshold = 1323.7;
-  qcsynd_t spectrum = observe_spectrum(H, p, w, t, N, se, threshold);
+  
 
-  qclist_list_t candidates = dsr(spectrum, w);
-  qclist_list_print(candidates, "");
+  /* // Creation of the code */
+  /* mysrnd(sh); */
+  /* qcmdpc_t H = qcmdpc_rand(p, w, myrnd); */
+
+  /* // Observe the spectrum */
+  /* float threshold = 1323.7; */
+  /* qcsynd_t spectrum = observe_spectrum(H, p, w, t, N, se, threshold); */
+
+  /* qclist_list_t candidates = dsr(spectrum, w); */
+  /* qclist_list_print(candidates, ""); */
   
 
 

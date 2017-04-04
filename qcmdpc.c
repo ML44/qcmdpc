@@ -1,37 +1,79 @@
 #include "qcmdpc.h"
 
-/* qcblock_t is a binary block of given length. The representation
-	 favors sparse blocks: it is given as a list of non-zero coordinate
-	 indices.
 
-	 Warning: qcblock_new(length, weight) allocates a block of given
-	 weight but do not initializes it. If weight=0 then index=NULL. */
+
 qcblock_t qcblock_new(int length, int weight) {
-	qcblock_t h = malloc(sizeof (struct qcblock));
-
-	h->length = length;
-	h->weight = weight;
-	h->index = (index_t *) malloc(weight * sizeof (index_t));
-
-	return h;
+  return sparse_vect_new(length, weight);
 }
 
 void qcblock_free(qcblock_t h) {
-	free(h->index);
-	free(h);
+  sparse_vect_free(h);
 }
 
-void qcblock_copy(qcblock_t copy, qcblock_t h) {
-	if (copy->weight != h->weight)
-		copy->index = (index_t *) realloc(copy->index, copy->weight * sizeof (index_t));
-	memcpy(copy->index, h->index, h->weight * sizeof (index_t));
+void qcblock_copy_noalloc(qcblock_t copy, qcblock_t h) {
+  sparse_vect_copy_noalloc(copy, h);
 }
 
-qcblock_t qcblock_copy_alloc(qcblock_t h) {
-	qcblock_t copy = qcblock_new(h->length, h->weight);
-	memcpy(copy->index, h->index, h->weight * sizeof (index_t));
-	return copy;
+qcblock_t qcblock_copy(qcblock_t h) {
+  return sparse_vect_copy(h);
 }
+
+qcblock_t qcblock_from_indexarray(index_t * v, int length, int weight) {
+  return sparse_vect_from_indexarray(v, length, weight);
+}
+
+qcblock_t qcblock_rand_noalloc(qcblock_t h, int (*rand_fct)()) {
+  return sparse_vect_rand_noalloc(h, (*rand_fct)());
+}
+
+qcblock_t qcblock_rand(int length, int weight, int (*rand_fct)()) {
+  return sparse_vect_rand( length, weight, (*rand_fct)());
+}
+
+
+
+/* Ou est xor noalloc ? */
+
+/* qcblock_t qcblock_xor(qcblock_t h0, qcblock_t h1) { */
+/* 	return qcblock_xor_noalloc(qcblock_new(h0->length, 0), h0, h1); */
+/* } */
+
+
+
+
+
+
+
+qcsynd_t qcsynd_new(int length) {
+  return dense_vect_new(length);
+}
+
+void qcsynd_free(qcsynd_t synd) {
+  dense_vect_free(synd);
+}
+
+void qcsynd_copy_noalloc(qcsynd_t copy, qcsynd_t s) {
+  dense_vect_copy_noalloc(copy, s);
+}
+
+qcsynd_t qcsynd_copy(qcsynd_t s) {
+  return dense_vect_copy(s);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* qcmdpc_t is a set of INDEX blocks (INDEX is a macro) representing a
 	 QC-MDPC code. Each of the INDEX qcblock_t is the sparse
@@ -47,7 +89,7 @@ qcmdpc_t qcmdpc_new(int length, int weight) {
 	for (i = 0; i < INDEX; ++i) {
 		h[i].length = length;
 		h[i].weight = weight;
-		h[i].index = (index_t *) malloc(weight * sizeof (index_t));
+		h[i].coeff = (index_t *) malloc(weight * sizeof (index_t));
 	}
 
 	return h;
@@ -57,131 +99,12 @@ void qcmdpc_free(qcmdpc_t h) {
 	int i;
 
 	for (i = 0; i < INDEX; ++i) {
-		free(h[i].index);
+		free(h[i].coeff);
 	}
 	free(h);
 }
 
-/* qcsynd_t is the type used to represent a syndrome. In the current
-	 implementation, it is assumed that the syndrome is represented as a
-	 dense column vector.  If the weight is unknown its value is set to
-	 -1.  If the weight is >=0 it is assumed to be correct.
 
-	 qcsynd_new(length) allocates a dense vector of given length and
-	 initializes it to null */
-qcsynd_t qcsynd_new(int length) {
-	qcsynd_t synd = malloc(sizeof (struct qcsynd));
-
-	synd->length = length;
-	synd->weight = 0;
-	synd->coeff = (char *) calloc(length, sizeof (char));
-
-	return synd;
-}
-
-void qcsynd_free(qcsynd_t synd) {
-	free(synd->coeff);
-	free(synd);
-}
-
-void qcsynd_copy(qcsynd_t copy, qcsynd_t s) {
-	copy->weight = s->weight;
-	memcpy(copy->coeff, s->coeff, s->length * sizeof (char));
-}
-
-qcsynd_t qcsynd_copy_alloc(qcsynd_t s) {
-	qcsynd_t copy = qcsynd_new(s->length);
-	copy->weight = s->weight;
-	memcpy(copy->coeff, s->coeff, s->length * sizeof (char));
-	return copy;
-}
-
-/* allocate a new qcblock_t to contain the t indices in v[]. */
-qcblock_t qcblock_from_indexarray(index_t * v, int length, int weight) {
-	qcblock_t h = qcblock_new(length, weight);
-
-	memcpy(h->index, v, weight * sizeof (index_t));
-
-	return h;
-}
-
-/* compute the xor of two blocks in a third one, previously allocated */
-qcblock_t qcblock_xor_noalloc(qcblock_t h, qcblock_t h0, qcblock_t h1) {
-	int i, j;
-
-	/* make sure we have enough space in the block h */
-	h->index = realloc(h->index, (qcblock_weight(h0) + qcblock_weight(h1)) * sizeof (index_t));
-	i = 0;
-	j = 0;
-	while (1) {
-		if (j == qcblock_weight(h1)) {
-			for (; i < qcblock_weight(h0); ++i) {
-				h->index[h->weight] = qcblock_index(h0, i);
-				h->weight++;
-			}
-			break;
-		} else if (i == qcblock_weight(h0)) {
-			for (; j < qcblock_weight(h1); ++j) {
-				h->index[h->weight] = qcblock_index(h1, j);
-				h->weight++;
-			}
-			break;
-		} else if (qcblock_index(h0, i) == qcblock_index(h1, j)) {
-			++i;
-			++j;
-		} else if (qcblock_index(h0, i) > qcblock_index(h1, j)) {
-			h->index[h->weight] = qcblock_index(h1, j);
-			h->weight++;
-			++j;
-		} else { // qcblock_index(h0, i) < qcblock_index(h1, j)
-			h->index[h->weight] = qcblock_index(h0, i);
-			h->weight++;
-			++i;
-		}
-	}
-	/* reajust the allocated size */
-	h->index = realloc(h->index, h->weight * sizeof (index_t));
-
-	return h;
-}
-/* compute the xor of two blocks return the result in a newly
-	 allocated block */
-qcblock_t qcblock_xor(qcblock_t h0, qcblock_t h1) {
-	return qcblock_xor_noalloc(qcblock_new(h0->length, 0), h0, h1);
-}
-
-static int indexcomp(const void *i, const void *j) {
-	return (int) (*(index_t *)i - *(index_t *)j);
-}
-
-/* pick a random (sparse) binary block h of length h->length and of
-	 weight h->weight in a previously allocated block */
-qcblock_t qcblock_rand_noalloc(qcblock_t h, int (*rand_fct)()) {
-	int i, j;
-	index_t x, rand_perm_block[h->length];
-
-	for (i = 0; i < h->length; ++i) {
-		rand_perm_block[i] = i;
-	}
-
-	for (i = 0; i < h->weight; ++i) {
-		j = i + rand_fct() % (h->length - i);
-		x = rand_perm_block[i];
-		rand_perm_block[i] = rand_perm_block[j];
-		rand_perm_block[j] = x;
-	}
-
-	qsort(rand_perm_block, h->weight, sizeof (index_t), indexcomp);
-	memcpy(h->index, rand_perm_block, h->weight * sizeof (index_t));
-
-	return h;
-}
-
-/* allocate and pick a random (sparse) binary block of given length
-	 and weight */
-qcblock_t qcblock_rand(int length, int weight, int (*rand_fct)()) {
-	return qcblock_rand_noalloc(qcblock_new(length, weight), rand_fct);
-}
 
 /* allocate and pick a random QC-MDPC code formed of INDEX circulant
  blocks of given length and weight. The i-th circulant block of H is
@@ -197,17 +120,29 @@ qcmdpc_t qcmdpc_rand(int length, int weight, int (*rand_fct)()) {
 	return H;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 /* add to the syndrome synd the j-th cyclic shift of the column vector h */
 qcsynd_t qcmdpc_synd_add(qcsynd_t synd, qcblock_t h, int j) {
 	int i, l;
 	char c;
 
-	for (l = 0; l < qcblock_weight(h); ++l) {
-		i = j + qcblock_index(h, l);
-		if (i >= qcblock_length(h))
-			i -= qcblock_length(h);
-		c = qcsynd_flip_coeff(synd, i);
-		synd->weight += 2 * c - 1;
+	for (l = 0; l < vect_weight(h); ++l) {
+		i = j + vect_coeff(h, l);
+		if (i >= vect_length(h))
+			i -= vect_length(h);
+		c = qcsynd_flip_coeff(synd, i); // TODO
+		vect_weight(synd) += 2 * c - 1;
 	}
 
 	return synd;
@@ -220,9 +155,9 @@ qcsynd_t qcmdpc_synd_adjust(qcsynd_t synd, qcmdpc_t H, qcblock_t e) {
 	qcblock_t h;
 
 	h = qcmdpc_block(H, 0);
-	p = qcblock_length(h);
-	for (offset = 0, i = 0, l = 0; i < qcblock_weight(e); ++i) {
-		j = qcblock_index(e, i) - offset;
+	p = vect_length(h);
+	for (offset = 0, i = 0, l = 0; i < vect_weight(e); ++i) {
+		j = vect_coeff(e, i) - offset;
 		if (j >= p) {
 			j -= p;
 			offset += p;
@@ -241,50 +176,57 @@ qcsynd_t qcmdpc_synd(qcmdpc_t H, qcblock_t e) {
 	return qcmdpc_synd_adjust(qcsynd_new(qcmdpc_block_length(H)), H, e);
 }
 
+
+
+
+
+
+
+
 /* computes a single counter value for a position j, with
 	 0 <= j < codelength */
-counter_t qcmdpc_counter(qcmdpc_t H, qcsynd_t synd, int j) {
-	int i, l, p;
-	counter_t w;
-	qcblock_t h;
+/* counter_t qcmdpc_counter(qcmdpc_t H, qcsynd_t synd, int j) { */
+/* 	int i, l, p; */
+/* 	counter_t w; */
+/* 	qcblock_t h; */
 
-	w = 0;
-	p = qcmdpc_block_length(H);
-	h = qcmdpc_block(H, j / p);
-	j %= p;
-	for (l = 0; l < p; ++l) {
-		i = j + qcblock_index(h, l);
-		if (i >= p)
-			i -= p;
-		w += qcsynd_coeff(synd, i);
-	}
+/* 	w = 0; */
+/* 	p = qcmdpc_block_length(H); */
+/* 	h = qcmdpc_block(H, j / p); */
+/* 	j %= p; */
+/* 	for (l = 0; l < p; ++l) { */
+/* 		i = j + qcblock_index(h, l); */
+/* 		if (i >= p) */
+/* 			i -= p; */
+/* 		w += qcsynd_coeff(synd, i); */
+/* 	} */
 
-	return w;
-}
+/* 	return w; */
+/* } */
 
 /* computes all counter values, returns an array of counters of size
 	 codelength */
-counter_t * qcmdpc_count(qcmdpc_t H, qcsynd_t synd) {
-	int i, j, l, u, p;
-	counter_t * counter, * temp;
-	qcblock_t h;
+/* counter_t * qcmdpc_count(qcmdpc_t H, qcsynd_t synd) { */
+/* 	int i, j, l, u, p; */
+/* 	counter_t * counter, * temp; */
+/* 	qcblock_t h; */
 
-	p = qcmdpc_block_length(H);
-	counter = (counter_t *) calloc(INDEX * p, sizeof (counter_t));
+/* 	p = qcmdpc_block_length(H); */
+/* 	counter = (counter_t *) calloc(INDEX * p, sizeof (counter_t)); */
 
-	for (i = 0; i < p; ++i) {
-		if (qcsynd_coeff(synd, i)) {
-			for (temp = counter, u = 0; u < INDEX; ++u, temp += p) {
-				h = qcmdpc_block(H, u);
-				for (l = 0; l < qcblock_weight(h); ++l) {
-					j = i - qcblock_index(h, l);
-					if (j < 0)
-						j += p;
-					temp[j]++;
-				}
-			}
-		}
-	}
+/* 	for (i = 0; i < p; ++i) { */
+/* 		if (qcsynd_coeff(synd, i)) { */
+/* 			for (temp = counter, u = 0; u < INDEX; ++u, temp += p) { */
+/* 				h = qcmdpc_block(H, u); */
+/* 				for (l = 0; l < qcblock_weight(h); ++l) { */
+/* 					j = i - qcblock_index(h, l); */
+/* 					if (j < 0) */
+/* 						j += p; */
+/* 					temp[j]++; */
+/* 				} */
+/* 			} */
+/* 		} */
+/* 	} */
 
-	return counter;
-}
+/* 	return counter; */
+/* } */
