@@ -11,9 +11,10 @@ typedef sparse_vect_t qcblock_t;
 typedef qcblock_t qcmdpc_t;
 
 // dense representation for syndromes
-typedef struct dense_vect_t qcsynd_t;
+typedef dense_vect_t qcsynd_t;
 
 #define qcmdpc_block(H, i) ((H) + (i))
+#define qcsynd_flip_coeff(synd, i) ((synd)->coeff[i] ^= 1)
 
 qcblock_t qcblock_new(int length, int weight);
 void qcblock_free(sparse_vect_t h);
@@ -28,8 +29,8 @@ qcblock_t qcblock_rand(int length, int weight, int (*rand_fct)());
 
 qcsynd_t qcsynd_new(int length);
 void qcsynd_free(qcsynd_t synd);
-void qcsynd_copy(qcsynd_t copy, qcsynd_t s);
-qcsynd_t qcsynd_copy_alloc(qcsynd_t s);
+void qcsynd_copy_noalloc(qcsynd_t copy, qcsynd_t s);
+qcsynd_t qcsynd_copy(qcsynd_t s);
 
 qcmdpc_t qcmdpc_new();
 void qcmdpc_free(qcmdpc_t h);

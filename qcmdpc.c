@@ -23,11 +23,11 @@ qcblock_t qcblock_from_indexarray(index_t * v, int length, int weight) {
 }
 
 qcblock_t qcblock_rand_noalloc(qcblock_t h, int (*rand_fct)()) {
-  return sparse_vect_rand_noalloc(h, (*rand_fct)());
+  return sparse_vect_rand_noalloc(h, rand_fct);
 }
 
 qcblock_t qcblock_rand(int length, int weight, int (*rand_fct)()) {
-  return sparse_vect_rand( length, weight, (*rand_fct)());
+  return sparse_vect_rand( length, weight, rand_fct);
 }
 
 
@@ -45,7 +45,8 @@ qcblock_t qcblock_rand(int length, int weight, int (*rand_fct)()) {
 
 
 qcsynd_t qcsynd_new(int length) {
-  return dense_vect_new(length);
+  qcsynd_t s = dense_vect_new(length);
+  return s;
 }
 
 void qcsynd_free(qcsynd_t synd) {
@@ -84,7 +85,7 @@ qcsynd_t qcsynd_copy(qcsynd_t s) {
 	 weight but do not initialize them */
 qcmdpc_t qcmdpc_new(int length, int weight) {
 	int i;
-	qcmdpc_t h = malloc(INDEX * sizeof (struct qcblock));
+	qcmdpc_t h = malloc(INDEX * sizeof (struct sparse_vect));
 
 	for (i = 0; i < INDEX; ++i) {
 		h[i].length = length;
@@ -173,7 +174,7 @@ qcsynd_t qcmdpc_synd_adjust(qcsynd_t synd, qcmdpc_t H, qcblock_t e) {
 /* allocate and return the syndrome of the error e in the QC-MDPC code
 	 H */
 qcsynd_t qcmdpc_synd(qcmdpc_t H, qcblock_t e) {
-	return qcmdpc_synd_adjust(qcsynd_new(qcmdpc_block_length(H)), H, e);
+	return qcmdpc_synd_adjust(qcsynd_new(vect_length(H)), H, e);
 }
 
 
