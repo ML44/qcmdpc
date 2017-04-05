@@ -30,13 +30,13 @@ qcblock_t qcblock_rand(int length, int weight, int (*rand_fct)()) {
   return sparse_vect_rand( length, weight, rand_fct);
 }
 
+qcblock_t qcblock_xor_noalloc(qcblock_t h, qcblock_t h0, qcblock_t h1) {
+  return sparse_vect_xor_noalloc(h, h0, h1);
+}
 
-
-/* Ou est xor noalloc ? */
-
-/* qcblock_t qcblock_xor(qcblock_t h0, qcblock_t h1) { */
-/* 	return qcblock_xor_noalloc(qcblock_new(h0->length, 0), h0, h1); */
-/* } */
+qcblock_t qcblock_xor(qcblock_t h0, qcblock_t h1) {
+  return sparse_vect_xor_noalloc(qcblock_new(h0->length, 0), h0, h1);
+}
 
 
 
@@ -184,50 +184,52 @@ qcsynd_t qcmdpc_synd(qcmdpc_t H, qcblock_t e) {
 
 
 
-/* computes a single counter value for a position j, with
-	 0 <= j < codelength */
-/* counter_t qcmdpc_counter(qcmdpc_t H, qcsynd_t synd, int j) { */
-/* 	int i, l, p; */
-/* 	counter_t w; */
-/* 	qcblock_t h; */
 
-/* 	w = 0; */
-/* 	p = qcmdpc_block_length(H); */
-/* 	h = qcmdpc_block(H, j / p); */
-/* 	j %= p; */
-/* 	for (l = 0; l < p; ++l) { */
-/* 		i = j + qcblock_index(h, l); */
-/* 		if (i >= p) */
-/* 			i -= p; */
-/* 		w += qcsynd_coeff(synd, i); */
-/* 	} */
 
-/* 	return w; */
-/* } */
+/* computes a single counter value for a position j, with */
+/* 	 0 <= j < codelength */
+counter_t qcmdpc_counter(qcmdpc_t H, qcsynd_t synd, int j) {
+	int i, l, p;
+	counter_t w;
+	qcblock_t h;
 
-/* computes all counter values, returns an array of counters of size
-	 codelength */
-/* counter_t * qcmdpc_count(qcmdpc_t H, qcsynd_t synd) { */
-/* 	int i, j, l, u, p; */
-/* 	counter_t * counter, * temp; */
-/* 	qcblock_t h; */
+	w = 0;
+	p = qcmdpc_block_length(H);
+	h = qcmdpc_block(H, j / p);
+	j %= p;
+	for (l = 0; l < p; ++l) {
+		i = j + vect_coeff(h, l);
+		if (i >= p)
+			i -= p;
+		w += vect_coeff(synd, i);
+	}
 
-/* 	p = qcmdpc_block_length(H); */
-/* 	counter = (counter_t *) calloc(INDEX * p, sizeof (counter_t)); */
+	return w;
+}
 
-/* 	for (i = 0; i < p; ++i) { */
-/* 		if (qcsynd_coeff(synd, i)) { */
-/* 			for (temp = counter, u = 0; u < INDEX; ++u, temp += p) { */
-/* 				h = qcmdpc_block(H, u); */
-/* 				for (l = 0; l < qcblock_weight(h); ++l) { */
-/* 					j = i - qcblock_index(h, l); */
-/* 					if (j < 0) */
-/* 						j += p; */
-/* 					temp[j]++; */
-/* 				} */
-/* 			} */
-/* 		} */
-/* 	} */
+/* computes all counter values, returns an array of counters of size */
+/* 	 codelength */
+counter_t * qcmdpc_count(qcmdpc_t H, qcsynd_t synd) {
+	int i, j, l, u, p;
+	counter_t * counter, * temp;
+	qcblock_t h;
 
-/* 	return counter; */
-/* } */
+	p = qcmdpc_block_length(H);
+	counter = (counter_t *) calloc(INDEX * p, sizeof (counter_t));
+
+	for (i = 0; i < p; ++i) {
+		if (vect_coeff(synd, i)) {
+			for (temp = counter, u = 0; u < INDEX; ++u, temp += p) {
+				h = qcmdpc_block(H, u);
+				for (l = 0; l < vect_weight(h); ++l) {
+					j = i - vect_coeff(h, l);
+					if (j < 0)
+						j += p;
+					temp[j]++;
+				}
+			}
+		}
+	}
+
+	return counter;
+}
