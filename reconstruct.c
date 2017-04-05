@@ -17,7 +17,7 @@ list_t get_neighbours(int v, qcblock_t S, qcsynd_t spectrum) {
 
 int get_p1(qcsynd_t spectrum){
   int p1 = 1;
-  while (vect_coeff(spectrum,p1)==0){
+  while (vect_coeff(spectrum,p1-1)==0){
     p1+=1;
   }
   return p1;

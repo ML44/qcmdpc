@@ -43,7 +43,9 @@ int main(int argc, char ** argv) {
   qcsynd_t s = spectrum(h);
   qcsynd_print(s, "s");
   printf("%d\n",vect_length(s));
-  list_t l = get_neighbours(0, h, s);
+  
+  list_t l = construct_A(s, get_p1(s));
+  printf("%d\n",get_p1(s));
   list_print(l,"");
   
 
