@@ -21,7 +21,7 @@
 void qcsynd_print(qcsynd_t s, char * str) {
   int i;
   printf("%s = { ", str);
-  for (i=0; i<vect_length(s); i++) {
+  for (i=0; i<vect_length(s)/2; i++) {
     printf("%d ; ", vect_coeff(s, i));
   }
   printf("} \n");
@@ -318,7 +318,7 @@ qcblock_t qcblock_from_list(list_t l) {
 qcsynd_t spectrum(qcblock_t e) { 
   int p = vect_length(e);
   int w = vect_weight(e);
-  qcsynd_t spectre = qcsynd_new(p/2);
+  qcsynd_t spectre = qcsynd_new(p);
   int i, j, d1, d2, d;
   
   for (i=0; i<w-1; ++i) {

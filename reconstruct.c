@@ -1,14 +1,14 @@
 #include "reconstruct.h"
 
 char adjacence(int i, int j, qcsynd_t spectrum) { // à utiliser plutot que directement le spectre
-  return spectrum->coeff[MIN(abs(j-i),abs(i-j))];
+  return vect_coeff(spectrum,spectrum_dist(i,j,vect_length(spectrum))-1);
 }
 
 list_t get_neighbours(int v, qcblock_t S, qcsynd_t spectrum) {
   list_t n = list_init(vect_length(S));
   for (int i=0; i<vect_weight(S); i++) {
-    int j = vect_coeff(S,i);
-    if (j!=v && adjacence(v,j,spectrum)) {
+    int j = vect_coeff(S,i); 
+    if (v!=j && adjacence(v,j,spectrum)) {
       list_add(n,vect_coeff(S,i));
     }
   }

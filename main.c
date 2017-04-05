@@ -38,9 +38,13 @@ int main(int argc, char ** argv) {
   mysrnd(sh);
   qcblock_t h = qcblock_rand(p,w,myrnd);
   qcblock_print(h, "h");
+  printf("%d\n",vect_length(h));
+
   qcsynd_t s = spectrum(h);
   qcsynd_print(s, "s");
-  list_t l = get_neighbours(0, h, spectrum);
+  printf("%d\n",vect_length(s));
+  list_t l = get_neighbours(0, h, s);
+  list_print(l,"");
   
 
 
