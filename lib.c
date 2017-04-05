@@ -45,9 +45,10 @@ void mysrnd(int seed) { srandom(seed); }
 // -----------------------------------
 // new empty list
 // -----------------------------------
-list_t list_init( void ) {
+list_t list_init( int p ) {
   list_t l = malloc( sizeof ( struct list ) );
   l->index = NULL;
+  l->p = p;
   l->length=0;
   return l;
 }
@@ -87,6 +88,29 @@ void list_remove(list_t l) {
 }
 
 
+// -----------------------------------
+// adds list l2 at the end of the list l1
+// -----------------------------------
+void list_extend(list_t l1, list_t l2) {
+  node_t current = l1->index;
+  for (int i=0; i<l1->length; i++) {
+    current = current->next;
+  }
+  current->next = l2->index;
+  l1->length += l2->length;
+}
+
+
+// -----------------------------------
+// sorts the list
+// -----------------------------------
+void list_sort(list_t l) {
+  
+}
+  
+
+
+
 
 // -----------------------------------
 // prints the list with str prefix message
@@ -99,6 +123,24 @@ void list_print(list_t l, char * str) {
     current = current->next;
   }
   printf("}\n");
+}
+
+
+
+
+
+// -----------------------------------
+// removes the first value of the list
+// -----------------------------------
+void list_remove_ith(list_t l, int i) {
+  node_t current = l->index;
+  for (int k=0; k<i; k++)
+    {
+      current = current->next;
+    }
+  current->next = (current->next)->next;
+  l->length-=1;
+  
 }
 
 
@@ -190,6 +232,21 @@ void list_list_print(list_list_t l, char * str) {
     }
   printf("}\n");
 }
+
+
+// -----------------------------------
+// adds list l2 at the end of the list l1
+// -----------------------------------
+void list_list_extend(list_list_t l1, list_list_t l2) {
+  list_node_t current = l1->index;
+  for (int i=0; i<l1->length; i++) {
+    current = current->next;
+  }
+  current->next = l2->index;
+  l1->length += l2->length;
+}
+
+
 
 
 

@@ -4,7 +4,8 @@
 #define INDEX 2
 #endif
 
-
+#ifndef QCMDPC_H
+#define QCMDPC_H
 
 // sparse representation for errors
 typedef sparse_vect_t qcblock_t;
@@ -45,3 +46,5 @@ qcsynd_t qcmdpc_synd(qcmdpc_t H, qcblock_t e);
 typedef uint8_t counter_t;
 counter_t qcmdpc_counter(qcmdpc_t H, qcsynd_t synd, int j);
 counter_t * qcmdpc_count(qcmdpc_t H, qcsynd_t synd);
+
+#endif

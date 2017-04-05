@@ -6,6 +6,9 @@
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 
+#ifndef LIB_H
+#define LIB_H
+
 /* Index type definition */
 typedef uint16_t index_t; // limits the code length to 65536
 //typedef uint32_t index_t;
@@ -25,17 +28,22 @@ struct node {
 };
 typedef struct node * node_t;
 struct list {
+  int    p;
   int    length;
   node_t index;
 };
 typedef struct list * list_t;
 
 #define list_length(l) ((l)->length)
-list_t list_init( void );
+#define list_p(l) ((l)->p)
+list_t list_init( int p );
 char list_isempty(list_t l);
 void list_add(list_t l, index_t v);
 void list_remove(list_t l);
+void list_extend(list_t l1, list_t l2);
+void list_sort(list_t l);
 void list_print(list_t l, char * str);
+void list_remove_ith(list_t l, int i);
 
 
 /* Lists of lists */
@@ -55,6 +63,7 @@ list_list_t list_list_init( void );
 char list_list_isempty(list_list_t l);
 void list_list_add(list_list_t l, list_t v);
 void list_list_remove(list_list_t l);
+void list_list_extend(list_list_t l1, list_list_t l2);
 void list_list_print(list_list_t l, char * str);
 
 
@@ -98,3 +107,4 @@ dense_vect_t dense_vect_copy(dense_vect_t s);
 #define vect_length(v) ((v)->length)
 #define vect_coeff(v, i) ((v)->coeff[i])
 
+#endif

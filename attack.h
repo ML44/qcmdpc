@@ -1,5 +1,7 @@
-#include "qcmdpc_graph.h"
+#include "qcmdpc.h"
 
+#ifndef ATTACK_H
+#define ATTACK_H
 
 // Qcsynd
 void qcsynd_print(qcsynd_t s, char * str);
@@ -25,9 +27,9 @@ dist_count_float_t * dist_count_float_new(int length);
 void dist_count_float_print(dist_count_float_t (* counter), int p, char * str);
 void dist_count_float_free(dist_count_float_t (* counter));
 
-// Qclist
-qclist_t qclist_from_qcblock(qcblock_t h);
-qcblock_t qcblock_from_qclist(qclist_t l);
+// List
+list_t list_from_qcblock(qcblock_t h);
+qcblock_t qcblock_from_list(list_t l);
 
 // Distance Spectrum
 qcsynd_t spectrum(qcblock_t e);
@@ -35,18 +37,9 @@ void spectrum_add_to_counters(dist_count_t (* sweight_counter),
 			      dist_count_t (* dist_freq_counter), 
 			      qcsynd_t spectre, int sw);
 qcsynd_t spectrum_from_counter(dist_count_float_t * counter, int p, float threshold);
-char spectrum_test_new_bit(qcsynd_t s, qclist_t k, int i);
-char block_from_spectrum_aux(qcsynd_t spectre, qclist_t k, int w, int b);
-qcblock_t block_from_spectrum(qcsynd_t spectre, int w);
 int spectrum_dist( int i, int j, int p);
 
-
-// Data functions
-void syndrom_weight_distribution(int p, int w, int t, int d, int N, int se, int sh);
-
 // Reconstruction functions
-void spectrum_reconstruction(int p, int w, int t, int N, int se, int sh);
 void block_reconstruction(int length, int weight, int seed);
 
-qcsynd_t observe_spectrum(qcmdpc_t H, int p, int w, int t, int N, int se, float threshold);
-
+#endif

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "qcmdpc_dec.h"
+#include "decrypt.h"
 #include "misc.h"
 
 qcblock_t flip_list(counter_t * counter, int threshold) {

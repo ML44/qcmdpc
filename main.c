@@ -3,11 +3,10 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-/* #include "qcmdpc_dec.h" */
-/* #include "qcmdpc_attack.h" */
-/* #include "qcmdpc_reconstruct.h" */
-#include "qcmdpc.h"
+#include "lib.h"
 
+#include "observe.h"
+#include "reconstruct.h"
 
 
 int main(int argc, char ** argv) {
@@ -33,44 +32,62 @@ int main(int argc, char ** argv) {
   t = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 42;
 
   
-  printf("%d\n", spectral_dist(N, sh, se));
-  
-  
-  qcblock_t b = qcblock_new(10,3);
-  sparse_vect_free(b);
   
 
   
+  mysrnd(sh);
+  qcblock_t h = qcblock_rand(p,w,myrnd);
+  qcblock_print(h, "h");
+  qcsynd_t s = spectrum(h);
+  qcsynd_print(s, "s");
+  list_t l = get_neighbours(0, h, spectrum);
+  
+
 
   /* // Creation of the code */
   /* mysrnd(sh); */
   /* qcmdpc_t H = qcmdpc_rand(p, w, myrnd); */
 
   /* // Observe the spectrum */
-  /* float threshold = 1323.7; */
+  /* float threshold = 1323.7; // a fixer comment ? */
   /* qcsynd_t spectrum = observe_spectrum(H, p, w, t, N, se, threshold); */
+  /* qcsynd_print(spectrum,"observed"); */
+  /* printf("%d\n", spectrum->weight); */
 
-  /* qclist_list_t candidates = dsr(spectrum, w); */
-  /* qclist_list_print(candidates, ""); */
+  
+  
+  /* list_list_t candidates = dsr(spectrum, w); */
+  /* list_list_print(candidates, ""); */
   
 
 
 
   /* mysrnd(sh); */
   /* qcblock_t h = qcblock_rand(p,w,myrnd); */
-  /* /\* qcblock_print(h, "h"); *\/ */
+  /* qcblock_print(h, "h"); */
   /* qcsynd_t s = spectrum(h); */
-  /* /\* qcsynd_print(s, "s"); *\/ */
+  /* qcsynd_print(s, "s"); */
+
+  /* for(int i=0; i<vect_length(s);i++)  */
+  /*   { */
+  /*     if (i%3==0)  */
+  /* 	{ */
+  /* 	  vect_coeff(s,i)=0; */
+	  
+  /* 	} */
+  /*   } */
+  /* qcsynd_print(s, "s'"); */
+  
 
   /* graph_t g = graph_new(h, s); */
   /* graph_print(g); */
-  /* qclist_list_t l = graph_findMaxClique(g); */
-  /* qclist_list_print(l, "result"); */
+  /* list_list_t l = graph_findMaxClique(g); */
+  /* list_list_print(l, "result"); */
   
 
-  /* spectrum_reconstruction(p, w, t, N, se, sh); */
   /* syndrom_weight_distribution(p, w, t, d, N, se, sh); */
   /* block_reconstruction(p, w, sh); */
+  /* qcsynd_t spectrum = observe_spectrum(H, p, w, t, N, se, threshold); */
 
 
 

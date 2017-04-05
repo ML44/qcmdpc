@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include "qcmdpc_graph.h"
+#include "graphs.h"
 
 
 
@@ -47,16 +47,16 @@ void nodeSet_print( graph_t g, nodeSet_t ns ) {
 	int i;
 	printf(" the size of clique : %d - [",ns->size);
 	for ( i = 0; i < ns->size; i++ ) {
-	  printf( "%d,",g->vertices->index[ns->node[i]]);
+	  printf( "%d,",g->vertices->coeff[ns->node[i]]);
        	}
 	printf("]\n");
 }
 
 
-qclist_t nodeSet_to_list( graph_t g, nodeSet_t ns ) {
-  qclist_t l = qclist_init(g->p);
+list_t nodeSet_to_list( graph_t g, nodeSet_t ns ) {
+  list_t l = list_init(g->p);
   for (int i = ns->size - 1; i >= 0; i-- ) {
-    qclist_add(l, g->vertices->index[ns->node[i]]);
+    list_add(l, g->vertices->coeff[ns->node[i]]);
   }
   return l;
 }
@@ -99,7 +99,7 @@ void graph_free( graph_t g ) {
 void graph_print( graph_t g ) {
   printf("graph = { ");
   for (int i=0; i<(g->N); i++) {
-    printf( "%d ; ",g->vertices->index[i]);
+    printf( "%d ; ",g->vertices->coeff[i]);
   }
   printf("} \n");
 }
@@ -107,8 +107,8 @@ void graph_print( graph_t g ) {
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 char graph_areConnected( graph_t g, int nodeA, int nodeB ) {
-  int i = g->vertices->index[nodeA];
-  int j = g->vertices->index[nodeB];
+  int i = g->vertices->coeff[nodeA];
+  int j = g->vertices->coeff[nodeB];
   int d = (j>i) ? (MIN(j-i,(g->p)-(j-i))) : (MIN(i-j,(g->p)-(i-j))); // TODO define higher function
 
   /* printf("Check connected %d %d (dist %d) : ", i, j, d); */
@@ -145,20 +145,20 @@ int graph_size( graph_t g ) {
 // An implementation of Bron-Kerbosch algorithm
 // From Algorithm 457 of the Collected Algorithms from CACM
 // http://www.netlib.org/tomspdf/457.pdf
-qclist_list_t graph_findMaxClique( graph_t g ) {
+list_list_t graph_findMaxClique( graph_t g ) {
   int i;
   int *all = (int *) malloc(g->N*sizeof(int));
   for (i=0; i<g->N; i++) {
     all[i] = i;
   }
-  qclist_list_t result_list = qclist_list_init(g->p);
+  list_list_t result_list = list_list_init();
   graph_bkv2( g, all, 0, g->N, result_list );
   free( all );
   return result_list;
 }
 
 // recursive function version 2 of Bron-Kerbosch algorithm
-void graph_bkv2( graph_t g, int* oldSet, int ne, int ce, qclist_list_t l) {
+void graph_bkv2( graph_t g, int* oldSet, int ne, int ce, list_list_t l) {
   int *newSet = (int *)malloc(ce*sizeof(int));
   int nod, fixp;
   int newne, newce, i, j, count, pos, p, s, sel, minnod;
@@ -214,7 +214,7 @@ void graph_bkv2( graph_t g, int* oldSet, int ne, int ce, qclist_list_t l) {
     nodeSet_add(g->subgraph, sel );
     if (newce == 0) {
       // found a max clique
-      qclist_list_add(l, nodeSet_to_list(g, g->subgraph)); // TODO stocker et retourner la liste
+      list_list_add(l, nodeSet_to_list(g, g->subgraph)); // TODO stocker et retourner la liste
       
     } else if (newne < newce)
       graph_bkv2(g, newSet, newne, newce, l);

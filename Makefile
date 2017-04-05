@@ -30,14 +30,14 @@ endif
 
 all: qcmdpc$(suffix)
 
-qcmdpc$(suffix): lib$(suffix).o qcmdpc_dec$(suffix).o qcmdpc$(suffix).o qcmdpc_attack$(suffix).o qcmdpc_main$(suffix).o qcmdpc_graph$(suffix).o qcmdpc_reconstruct$(suffix).o misc.o
+qcmdpc$(suffix): lib$(suffix).o qcmdpc$(suffix).o attack$(suffix).o reconstruct$(suffix).o  observe$(suffix).o main$(suffix).o graphs$(suffix).o  misc.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 %$(suffix).o: %.c qcmdpc.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
-qcmdpc_main$(suffix).o qcmdpc_dec$(suffix).o: qcmdpc_dec.h qcmdpc_attack.h
-qcmdpc_dec$(suffix).o: misc.h
+main$(suffix).o decrypt$(suffix).o: decrypt.h attack.h
+decrypt$(suffix).o: misc.h
 
 misc.o: misc.c
 	$(CC) $(CFLAGS) -c -o $@ $<
