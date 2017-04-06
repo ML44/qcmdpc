@@ -133,15 +133,27 @@ void list_print(list_t l, char * str) {
 // removes the first value of the list
 // -----------------------------------
 void list_remove_ith(list_t l, int i) {
-  node_t current = l->index;
-  for (int k=0; k<i; k++)
+  if (i==0) 
     {
-      current = current->next;
+      l->index = l->index->next;
+      l->length-=1;
     }
-  current->next = (current->next)->next;
-  l->length-=1;
-  
-}
+  else
+    {
+      node_t current = l->index;
+      int k=0;
+      
+      while (k<i-1)
+	{
+	  current = current->next;
+	  k++;
+	};
+      
+      current->next = (current->next)->next;
+      l->length-=1;
+      
+    }
+  }
 
 
 

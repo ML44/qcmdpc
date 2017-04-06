@@ -37,16 +37,19 @@ int main(int argc, char ** argv) {
   
   mysrnd(sh);
   qcblock_t h = qcblock_rand(p,w,myrnd);
-  qcblock_print(h, "h");
-  printf("%d\n",vect_length(h));
+  /* qcblock_print(h, "h"); */
+  /* printf("%d\n",vect_length(h)); */
 
   qcsynd_t s = spectrum(h);
-  qcsynd_print(s, "s");
-  printf("%d\n",vect_length(s));
+  /* qcsynd_print(s, "s"); */
   
-  list_t l = construct_A(s, get_p1(s));
-  printf("%d\n",get_p1(s));
-  list_print(l,"");
+  list_t A = construct_A(s, get_p1(s));
+  printf("p1 = %d\n",get_p1(s));
+  list_print(A,"A = ");
+  
+  list_list_t E = dsr(s,w);
+  printf("n = %d\n",list_list_length(E));
+  /* list_list_print(E, "E"); */
   
 
 

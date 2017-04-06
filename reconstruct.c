@@ -1,7 +1,7 @@
 #include "reconstruct.h"
 
 char adjacence(int i, int j, qcsynd_t spectrum) { // à utiliser plutot que directement le spectre
-  return vect_coeff(spectrum,spectrum_dist(i,j,vect_length(spectrum))-1);
+  return (i==j) | vect_coeff(spectrum,spectrum_dist(i,j,vect_length(spectrum))-1);
 }
 
 list_t get_neighbours(int v, qcblock_t S, qcsynd_t spectrum) {
@@ -25,8 +25,11 @@ int get_p1(qcsynd_t spectrum){
 
 list_t construct_A(qcsynd_t spectrum, int p1) {
   list_t A = list_init(0);
-  for (int i=p1+1; i<vect_length(spectrum); i++) {
-    if (vect_coeff(spectrum,i) && vect_coeff(spectrum,(i-p1))) {
+  int p = vect_length(spectrum);
+  
+  for (int i=p1+1; i<=p; i++) {
+    
+    if (vect_coeff(spectrum,spectrum_dist(0,i,p)-1) && vect_coeff(spectrum,spectrum_dist(i,p1,p)-1)) {
       list_add(A,i);
     }
   }
@@ -36,15 +39,22 @@ list_t construct_A(qcsynd_t spectrum, int p1) {
 list_t construct_B(qcsynd_t spectrum, list_t A, int p2) {
   list_t B = list_init(0);
   node_t current = A->index;
-  int i = current->val;
+  int i;
   
-  for (int k=0; k<list_length(A); k++) {	
-    if (i!=p2 && vect_coeff(spectrum,i-p2)) {
-	  list_add(B,i);
-	}
-    current = current->next;
-    i = current->val;
-  }
+  int k=0;
+  do
+    {
+      i = current->val;
+      
+      if (i!=p2 && vect_coeff(spectrum,spectrum_dist(i,p2,vect_length(spectrum))-1)) {
+	list_add(B,i);
+      }
+      
+      current = current->next;
+      k++;      
+    }
+  while (k<list_length(A));
+  
   return B;
 }
 
@@ -56,6 +66,9 @@ list_list_t get_cliques(list_t C, qcsynd_t spectrum, int size) {
     list_list_add(l,C);
   }
   else {
+
+
+
     /* TODO */
 
     /* list_t e1 = list_init(0); */
@@ -84,76 +97,123 @@ list_list_t dsr(qcsynd_t spectrum, int weight) {
   list_list_t E = list_list_init();
 
   node_t currentA = A->index;
-  int p2 = currentA->val;
+  int p2;
   
-  for (int kA=0; kA<A->length; kA++) { 
-    list_t B = construct_B(spectrum, A, p2);
-    list_t C = list_init(vect_length(spectrum));
-    list_add(C,0);
-    list_add(C,p1);
-    list_add(C,p2);
-    list_extend(C,B);
-    list_sort(C) ; // does nothing
-    char b = 1;
-    while ((list_length(C)>=weight) & b) {
-      //TODO
-      node_t currentC = C->index;
-      int i = currentC->val;
+  int kA=0;
+  do
+    {
+      p2 = currentA->val;
+      // IN THE A LOOP
 
-      for (int kC=0; kC<C->length; kC++) {
-	int c = 0;
 
-	node_t currentC2 = C->index;
-	int j = currentC2->val;
 
-	for (int kC2=0; kC2<C->length; kC2++) {
-	  if (adjacence(i, j, spectrum)) {
-	    c++;
+      list_t B = construct_B(spectrum, A, p2);
+      list_add(B,p2); // add sorted ?
+      list_add(B,p1);
+      list_add(B,0);
+
+
+      char b = 1;
+      while ((list_length(B)>=weight) & b) {
+	
+	/* printf("w = %d : ",list_length(B));	 */
+	/* list_print(B,"B = "); */
+	
+
+	node_t currentB = B->index;
+	int iB;
+
+	int kB=0;
+	do 
+	  {
+	    iB = currentB->val;
+	    // IN THE B LOOP
+	    
+	    int c = 0;
+	      
+
+	    node_t currentB2 = B->index;
+	    int jB;
+	    
+	    int kB2=0;
+	    do 
+	      {
+		jB = currentB2->val;
+		// IN THE B2 LOOP
+
+
+	    	if (adjacence(iB, jB, spectrum)) {
+		  /* printf("Checking (%d, %d) : ", iB, jB);		 */
+	    	  /* /\* printf("PASSED\n"); *\/ */
+		  
+		  c++;
+	    	}
+		/* else  */
+		/*   { */
+		/*     printf("Checking (%d, %d) : ", iB, jB);		 */
+		/*     printf("FAILED\n");   */
+		/*   } */
+		
+
+		// END OF B2 LOOP
+		currentB2 = currentB2->next;
+		kB2++;      
+	      }
+	    while (kB2<list_length(B));
+
+
+
+	    if (c<weight) {
+	      /* printf("ENLEVER ELEMENT %d \n", kB); */
+	      list_remove_ith(B,kB);
+	      break;
+	    }
+
+
+	    if (kB == list_length(B) - 1) {
+	      b = 0;
+	    }
+
+
+	    // END OF B LOOP
+	    currentB = currentB->next;
+	    kB++;      
 	  }
-
-	currentC2 = currentC2->next;
-	j = currentC2->val;
-	}
-	
-	
-	if (c<weight) {
-	  list_remove_ith(C,i); // TODO verifier que marche
-	  break;
-	}
-	
-	if (kC == C->length - 1) { // ???
-	  b = 0; 
-	}
-
-	currentC = currentC->next;
-	i = currentC->val;
+	while (kB<list_length(B));
+      
       }
+      
+      if (!(b)) {
+	list_list_add(E,B);
+      }
+
+      // END OF A LOOP
+      currentA = currentA->next;
+      kA++;      
     }
-    
-    if (!(b)) {
-	list_list_add(E,C);
-      }
-    
-    currentA = currentA->next;
-    p2 = currentA->val;
-  }
+  while (kA<list_length(A));
 
+  return E;
+  
+  /*
   list_list_t F = list_list_init();
   list_node_t currentE = E->index;
   list_t S = currentE->val;
   for (int kS=0; kS<E->length; kS++) {
     list_list_t K = get_cliques(S, spectrum, weight);
-    /* for (k in K) { */
-    /*   if not(k in F) { */
-    /* list_list_add(F,k); */
-	/* } */
-    /* } */
+    for (k in K) {
+      if not(k in F) {
+    list_list_add(F,k);
+	}
+    }
     list_list_extend(F,K);
     
     currentE = currentE->next;
     S = currentE->val;
   }
   return F;
+  */
+
 }
 
 
