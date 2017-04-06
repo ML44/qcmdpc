@@ -62,14 +62,13 @@ list_t construct_B(qcsynd_t spectrum, list_t A, int p2) {
 
 list_list_t get_cliques(list_t C, qcsynd_t spectrum, int size) {
   list_list_t l = list_list_init();
-  if (list_length(C)==size) {
-    list_sort(C); // does nothing
-    list_list_add(l,C);
-  }
-  else {
+  list_list_add(l,C);
 
-
-
+  /* if (list_length(C)==size) { */
+  /*   list_sort(C); // does nothing */
+  /*   list_list_add(l,C); */
+  /* } */
+  /* else { */
     /* TODO */
 
     /* list_t e1 = list_init(0); */
@@ -86,7 +85,8 @@ list_list_t get_cliques(list_t C, qcsynd_t spectrum, int size) {
     /*   list_list_add(l,c); */
     /*   /\* } *\/ */
     /* } */
-  }
+  /* } */
+
   return l;
 }
 
@@ -194,28 +194,55 @@ list_list_t dsr(qcsynd_t spectrum, int weight) {
     }
   while (kA<list_length(A));
 
-  return E;
-  
-  /*
+
+
+
+
+
+
   list_list_t F = list_list_init();
+  
   list_node_t currentE = E->index;
-  list_t S = currentE->val;
-  for (int kS=0; kS<E->length; kS++) {
-    list_list_t K = get_cliques(S, spectrum, weight);
-    for (k in K) {
-      if not(k in F) {
-    list_list_add(F,k);
-	}
+  list_t S;
+  int kE=0;
+  do 
+    {
+      S = currentE->val;
+      // IN THE E LOOP
+
+      list_list_t K = get_cliques(S, spectrum, weight); // TODO 
+      /* Pour le moment renvoit K = [S] */
+
+      list_list_print(K,"K");
+      list_list_print(K,"F");
+     
+      // PROBLEME ICI
+      list_list_extend(F,K); // TODO enlever les doublons
+
+      
+      // END OF B2 LOOP
+      currentE = currentE->next;
+      kE++;      
     }
-    list_list_extend(F,K);
-    
-    currentE = currentE->next;
-    S = currentE->val;
-  }
+  while (kE<list_length(E));
+
   return F;
-  */
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
