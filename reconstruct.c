@@ -1,7 +1,7 @@
 #include "reconstruct.h"
 
 char adjacence(int i, int j, qcsynd_t spectrum) { // à utiliser plutot que directement le spectre
-  return (i==j) | vect_coeff(spectrum,spectrum_dist(i,j,vect_length(spectrum))-1);
+  return (i==j) | (vect_coeff(spectrum,spectrum_dist(i,j,vect_length(spectrum))-1)>0);
 }
 
 list_t get_neighbours(int v, qcblock_t S, qcsynd_t spectrum) {
@@ -17,7 +17,7 @@ list_t get_neighbours(int v, qcblock_t S, qcsynd_t spectrum) {
 
 int get_p1(qcsynd_t spectrum){
   int p1 = 1;
-  while (vect_coeff(spectrum,p1-1)==0){
+  while (adjacence(0,p1,spectrum)==0) {
     p1+=1;
   }
   return p1;
@@ -29,9 +29,10 @@ list_t construct_A(qcsynd_t spectrum, int p1) {
   
   for (int i=p1+1; i<=p; i++) {
     
-    if (vect_coeff(spectrum,spectrum_dist(0,i,p)-1) && vect_coeff(spectrum,spectrum_dist(i,p1,p)-1)) {
-      list_add(A,i);
-    }
+    if (adjacence(0,i,spectrum) & adjacence(i,p1,spectrum))
+      {
+	list_add(A,i);
+      }
   }
   return A;
 }
@@ -46,8 +47,8 @@ list_t construct_B(qcsynd_t spectrum, list_t A, int p2) {
     {
       i = current->val;
       
-      if (i!=p2 && vect_coeff(spectrum,spectrum_dist(i,p2,vect_length(spectrum))-1)) {
-	list_add(B,i);
+      if ((i!=p2) & adjacence(i,p2,spectrum)) {
+	list_add_sorted(B,i); 
       }
       
       current = current->next;
@@ -108,7 +109,7 @@ list_list_t dsr(qcsynd_t spectrum, int weight) {
 
 
       list_t B = construct_B(spectrum, A, p2);
-      list_add(B,p2); // add sorted ?
+      list_add_sorted(B,p2); // add sorted ?
       list_add(B,p1);
       list_add(B,0);
 

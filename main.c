@@ -34,7 +34,39 @@ int main(int argc, char ** argv) {
   
   
 
+  /* list_t l = list_init(0); */
+  /* printf("%d : ", list_length(l)); */
+  /* list_print(l,""); */
+  /* list_add_sorted(l,5); */
+  /* printf("%d : ", list_length(l)); */
+  /* list_print(l,""); */
+  /* list_add_sorted(l,3); */
+  /* printf("%d : ", list_length(l)); */
+  /* list_print(l,""); */
+  /* list_add_sorted(l,4); */
+  /* printf("%d : ", list_length(l)); */
+  /* list_print(l,""); */
+  /* list_add_sorted(l,1); */
+  /* printf("%d : ", list_length(l)); */
+  /* list_print(l,""); */
+  /* list_add_sorted(l,7); */
+  /* printf("%d : ", list_length(l)); */
+  /* list_print(l,""); */
+  /* list_add_sorted(l,2); */
+  /* printf("%d : ", list_length(l)); */
+  /* list_print(l,""); */
   
+
+
+
+
+
+
+
+
+
+
+
   mysrnd(sh);
   qcblock_t h = qcblock_rand(p,w,myrnd);
   /* qcblock_print(h, "h"); */
@@ -49,7 +81,22 @@ int main(int argc, char ** argv) {
   
   list_list_t E = dsr(s,w);
   printf("n = %d\n",list_list_length(E));
-  /* list_list_print(E, "E"); */
+  list_list_print(E, "E");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
 
 

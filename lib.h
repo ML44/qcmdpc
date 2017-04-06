@@ -39,6 +39,7 @@ typedef struct list * list_t;
 list_t list_init( int p );
 char list_isempty(list_t l);
 void list_add(list_t l, index_t v);
+void list_add_sorted(list_t l, index_t v);
 void list_remove(list_t l);
 void list_extend(list_t l1, list_t l2);
 void list_sort(list_t l);

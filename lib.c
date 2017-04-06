@@ -78,6 +78,47 @@ void list_add(list_t l, index_t v) {
 
 
 // -----------------------------------
+// assumes l is sorted and adds value v at the right position
+// -----------------------------------
+void list_add_sorted(list_t l, index_t v) {
+  if (l->length == 0) 
+    {
+      list_add(l, v);
+    }
+  else if (l->index->val > v) 
+    {
+      list_add(l, v);
+    }
+  else 
+    {
+      int i = 1;
+      node_t v_node = malloc(sizeof(node_t));
+      v_node->val = v;
+      node_t previous = l->index;
+
+      while(i<l->length) 
+	{
+	  if (previous->next->val > v) 
+	    {
+	      v_node->next = previous->next;
+	      previous->next = v_node;
+	      break;
+	    }
+	  previous = previous->next;
+	  i++;
+	}
+      if(i==l->length);
+      {
+	previous->next = v_node;
+      }
+      
+      l->length++;
+    }  
+}
+
+
+
+// -----------------------------------
 // removes the first value of the list
 // -----------------------------------
 void list_remove(list_t l) {
