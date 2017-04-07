@@ -64,8 +64,7 @@ list_list_t get_cliques(list_t C, qcsynd_t spectrum, int size) {
   
   list_list_t cliques;
   
-  /* if (list_length(C)==size) { */
-  if (1) {
+  if (list_length(C)==size) {
     cliques = list_list_init();
     list_list_add(cliques,C);
   }
