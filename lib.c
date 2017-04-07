@@ -134,7 +134,7 @@ void list_remove(list_t l) {
 // -----------------------------------
 void list_extend(list_t l1, list_t l2) {
   node_t current = l1->index;
-  for (int i=0; i<l1->length; i++) {
+  for (int i=0; i<l1->length-1; i++) {
     current = current->next;
   }
   current->next = l2->index;
@@ -147,6 +147,38 @@ void list_extend(list_t l1, list_t l2) {
 // -----------------------------------
 void list_sort(list_t l) {
   
+}
+
+
+// -----------------------------------
+// checks if lists are equal (same elements in same order)
+// -----------------------------------
+char list_equal(list_t l1, list_t l2) {
+  /* printf("Checks if equal :\n"); */
+  /* list_print(l1, "L1"); */
+  /* list_print(l2, "L2"); */
+  
+  
+  if (l1->length != l2->length) 
+    {
+      /* printf("NO-length\n"); */
+      return 0;
+    }
+  node_t current1 = l1->index;
+  node_t current2 = l2->index;
+  for (int i=0; i<l1->length; i++)
+    {
+      if (current1->val != current2->val) 
+	{
+	  /* printf("NO-%d\n", i); */
+	  return 0;
+	}
+      current1 = current1->next;
+      current2 = current2->next;
+    }
+  /* printf("YES\n"); */
+  
+  return 1;
 }
   
 
@@ -217,7 +249,7 @@ void list_remove_ith(list_t l, int i) {
 // ********************************************************
 // ********************************************************
 
-// Lists
+// Lists of lists
 
 // ********************************************************
 // ********************************************************
@@ -287,17 +319,29 @@ void list_list_print(list_list_t l, char * str) {
 }
 
 
+
+
 // -----------------------------------
-// adds list l2 at the end of the list l1
+// checks if is in the list
 // -----------------------------------
-void list_list_extend(list_list_t l1, list_list_t l2) {
-  list_node_t current = l1->index;
-  for (int i=0; i<l1->length; i++) {
-    current = current->next;
-  }
-  current->next = l2->index;
-  l1->length += l2->length;
+char list_list_is_in(list_list_t l, list_t v) {
+  list_node_t current = l->index;
+  for (int i=0; i<l->length; i++) 
+    {
+      if (list_equal(current->val, v))
+	{
+	  return 1;
+	} 
+      current = current->next;
+    }
+  return 0;
 }
+
+
+
+
+
+
 
 
 

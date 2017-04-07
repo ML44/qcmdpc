@@ -43,6 +43,7 @@ void list_add_sorted(list_t l, index_t v);
 void list_remove(list_t l);
 void list_extend(list_t l1, list_t l2);
 void list_sort(list_t l);
+char list_equal(list_t l1, list_t l2);
 void list_print(list_t l, char * str);
 void list_remove_ith(list_t l, int i);
 
@@ -64,8 +65,8 @@ list_list_t list_list_init( void );
 char list_list_isempty(list_list_t l);
 void list_list_add(list_list_t l, list_t v);
 void list_list_remove(list_list_t l);
-void list_list_extend(list_list_t l1, list_list_t l2);
 void list_list_print(list_list_t l, char * str);
+char list_list_is_in(list_list_t l, list_t v);
 
 
 /* Spectral distance */

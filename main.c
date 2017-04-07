@@ -35,8 +35,32 @@ int main(int argc, char ** argv) {
   
 
   /* list_t l = list_init(0); */
-  /* printf("%d : ", list_length(l)); */
-  /* list_print(l,""); */
+  /* list_add(l,6); */
+  /* list_add(l,5); */
+  /* list_add(l,4); */
+  /* list_add(l,3); */
+  /* list_add(l,2); */
+
+  /* list_list_t ll1 = list_list_init(); */
+  /* list_list_t ll2 = list_list_init(); */
+  /* list_list_add(ll1,l); */
+  /* list_list_add(ll1,l); */
+
+  /* list_add(l,1); */
+
+  /* list_list_add(ll2,l); */
+  
+
+  /* printf("%d : ", list_list_length(ll1)); */
+  /* list_list_print(ll1,""); */
+  /* printf("%d : ", list_list_length(ll2)); */
+  /* list_list_print(ll2,""); */
+
+  /* list_list_extend(ll1, ll2); */
+  /* printf("%d : ", list_list_length(ll1)); */
+  /* list_list_print(ll1,""); */
+    
+
   /* list_add_sorted(l,5); */
   /* printf("%d : ", list_length(l)); */
   /* list_print(l,""); */
@@ -79,9 +103,9 @@ int main(int argc, char ** argv) {
   printf("p1 = %d\n",get_p1(s));
   list_print(A,"A = ");
   
-  list_list_t E = dsr(s,w);
-  printf("n = %d\n",list_list_length(E));
-  list_list_print(E, "E");
+  list_list_t F = dsr(s,w);
+  printf("lF = %d\n",list_list_length(F));
+  list_list_print(F, "F");
 
 
 

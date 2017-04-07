@@ -196,7 +196,8 @@ list_list_t dsr(qcsynd_t spectrum, int weight) {
 
 
 
-
+  list_list_print(E,"E");
+  
 
 
 
@@ -213,12 +214,29 @@ list_list_t dsr(qcsynd_t spectrum, int weight) {
       list_list_t K = get_cliques(S, spectrum, weight); // TODO 
       /* Pour le moment renvoit K = [S] */
 
-      list_list_print(K,"K");
-      list_list_print(K,"F");
-     
-      // PROBLEME ICI
-      list_list_extend(F,K); // TODO enlever les doublons
+      /* list_list_print(K,"K"); */
+      /* list_list_print(K,"F"); */
 
+
+      list_node_t currentK = K->index;
+      list_t iK;
+      int kK=0;
+      
+      do 
+	{
+	  iK = currentK->val;
+	  // IN THE K LOOP
+	  
+	  if(!(list_list_is_in(F, iK))) 
+	    {
+	      list_list_add(F,iK); // sans doublons
+	    }
+	  
+	  // END OF K LOOP
+	  currentK = currentK->next;
+	  kK++;      
+	}
+      while (kK<list_length(K));
       
       // END OF B2 LOOP
       currentE = currentE->next;
