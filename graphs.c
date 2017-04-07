@@ -109,19 +109,23 @@ void graph_print( graph_t g ) {
 char graph_areConnected( graph_t g, int nodeA, int nodeB ) {
   int i = g->vertices->coeff[nodeA];
   int j = g->vertices->coeff[nodeB];
-  int d = (j>i) ? (MIN(j-i,(g->p)-(j-i))) : (MIN(i-j,(g->p)-(i-j))); // TODO define higher function
+  return (i==j) | (vect_coeff(g->spectrum,spectrum_dist(i,j,vect_length(g->spectrum))-1)>0);
+
+
+  
+/* (j>i) ? (MIN(j-i,(g->p)-(j-i))) : (MIN(i-j,(g->p)-(i-j))); // TODO define higher function */
 
   /* printf("Check connected %d %d (dist %d) : ", i, j, d); */
-  if ( nodeA >= g->N || nodeB >= g->N ) {
-    printf( "AccessViolationInNodeConnectionCheck\n");
-    exit(-1);
-  }
-  char b = (d==0) || g->spectrum->coeff[d-1];
+  /* if ( nodeA >= g->N || nodeB >= g->N ) { */
+  /*   printf( "AccessViolationInNodeConnectionCheck\n"); */
+  /*   exit(-1); */
+  /* } */
+  /* char b = (d==0) || g->spectrum->coeff[d-1]; */
   /* if (b) */
   /*   { printf("TRUE \n"); } */
   /* else */
   /*   { printf("FALSE \n"); } */
-  return b;
+  /* return b; */
 }
 
 int graph_size( graph_t g ) { 

@@ -109,4 +109,9 @@ dense_vect_t dense_vect_copy(dense_vect_t s);
 #define vect_length(v) ((v)->length)
 #define vect_coeff(v, i) ((v)->coeff[i])
 
+
+/* Spect Dist */
+int spectrum_dist( int i, int j, int p);
+
+
 #endif

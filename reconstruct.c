@@ -61,33 +61,38 @@ list_t construct_B(qcsynd_t spectrum, list_t A, int p2) {
 
 
 list_list_t get_cliques(list_t C, qcsynd_t spectrum, int size) {
-  list_list_t l = list_list_init();
-  list_list_add(l,C);
-
+  
+  list_list_t cliques;
+  
   /* if (list_length(C)==size) { */
-  /*   list_sort(C); // does nothing */
-  /*   list_list_add(l,C); */
-  /* } */
-  /* else { */
-    /* TODO */
+  if (1) {
+    cliques = list_list_init();
+    list_list_add(cliques,C);
+  }
+  
+  else 
+    {
+      qcblock_t vertices = qcblock_new(list_p(C),list_length(C));
+      node_t current = C->index;
+      for(int i=0; i<list_length(C); i++) 
+	{
+	  vect_coeff(vertices, i) = current->val;
+	  current = current->next;
+	}
+      
+      
+      graph_t g = graph_new(vertices, spectrum);
+      cliques = graph_findMaxClique(g);
+      
+      /* list_print(C,"C"); */
+      /* qcblock_print(vertices, "v");       */
+      /* list_list_print(cliques,"cliques"); */
+      
+    }
+  
+  
 
-    /* list_t e1 = list_init(0); */
-    /* list_t e2 = list_init(0); */
-
-    /* list_list_t cliques = graph_bkv2(C, spectrum, e1, C, e2, l, weight); */
-    
-    /* list_node_t current_clique = cliques->index; */
-    /* list_t c = current_clique->val; */
-    
-    /* for (int k=0; k<cliques->weight; k++) { */
-    /*   /\* list_sort(c); *\/ */
-    /*   /\* if (!(c in l)) { // NON *\/ */
-    /*   list_list_add(l,c); */
-    /*   /\* } *\/ */
-    /* } */
-  /* } */
-
-  return l;
+  return cliques;
 }
 
 
@@ -196,7 +201,7 @@ list_list_t dsr(qcsynd_t spectrum, int weight) {
 
 
 
-  list_list_print(E,"E");
+  /* list_list_print(E,"E"); */
   
 
 

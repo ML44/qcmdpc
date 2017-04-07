@@ -557,3 +557,22 @@ dense_vect_t dense_vect_copy(dense_vect_t s) {
 	memcpy(copy->coeff, s->coeff, s->length * sizeof (char));
 	return copy;
 }
+
+
+
+
+
+
+
+// -----------------------------------
+// returns the distance between i and j with symetry of size p
+// -----------------------------------
+int spectrum_dist( int i, int j, int p) {
+  if (j>i) {
+    return MIN(j-i,p-(j-i));
+  }
+  else {
+    return MIN(i-j,p-(i-j));
+  }
+}
+

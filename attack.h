@@ -37,7 +37,6 @@ void spectrum_add_to_counters(dist_count_t (* sweight_counter),
 			      dist_count_t (* dist_freq_counter), 
 			      qcsynd_t spectre, int sw);
 qcsynd_t spectrum_from_counter(dist_count_float_t * counter, int p, float threshold);
-int spectrum_dist( int i, int j, int p);
 
 // Reconstruction functions
 void block_reconstruction(int length, int weight, int seed);

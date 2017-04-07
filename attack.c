@@ -368,19 +368,6 @@ qcsynd_t spectrum_from_counter(dist_count_float_t * counter, int p, float thresh
 }
 
 
-// -----------------------------------
-// returns the distance between i and j with symetry of size p
-// -----------------------------------
-int spectrum_dist( int i, int j, int p) {
-  if (j>i) {
-    return MIN(j-i,p-(j-i));
-  }
-  else {
-    return MIN(i-j,p-(i-j));
-  }
-}
-
-
 
 
 
