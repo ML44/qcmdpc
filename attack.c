@@ -358,12 +358,14 @@ void spectrum_add_to_counters(dist_count_t * sweight_counter,
 // with values lower thant the threshold
 // -----------------------------------
 qcsynd_t spectrum_from_counter(dist_count_float_t * counter, int p, float threshold) {
-  qcsynd_t spectre = qcsynd_new(p-1);
-  for (int i=0; i<p; ++i) {
+  qcsynd_t spectre = qcsynd_new(p/2);
+  for (int i=0; i<p/2; ++i) {
     if (counter[i]<threshold) {
 	qcsynd_set_coeff(spectre, i);
       }
   }
+  spectre->length = p; // ATTENTION length = p total
+  
   return spectre;
 }
 

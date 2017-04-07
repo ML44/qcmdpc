@@ -121,7 +121,7 @@ qcsynd_t observe_spectrum(qcmdpc_t H, int p, int w, int t, int N, int se, float 
   }
 
   // compute the (hypothetical) spectrum of h
-  qcsynd_t spectrum_h = spectrum_from_counter(ratio_counter, p/2, threshold);
+  qcsynd_t spectrum_h = spectrum_from_counter(ratio_counter, p, threshold);
 
   // write .dat file
    FILE *fp;
@@ -133,7 +133,7 @@ qcsynd_t observe_spectrum(qcmdpc_t H, int p, int w, int t, int N, int se, float 
    fclose(fp);  
 
   // call gnuplot
-  system("gnuplot gnuplot-instructions.gnu > ./dat/1.png");
+  system("gnuplot gnuplot-instructions3.gnu > ./dat/1.png");
 
   return spectrum_h;
 }

@@ -9,7 +9,7 @@ set ylabel 'synd\_weight'
 
 # Axes ranges
 set xrange [0:2401]
-set yrange [1318:1326]
+set yrange [135:145]
 
 set title "Average syndrom weight per distance (1 block, N tries)"
 
