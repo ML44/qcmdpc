@@ -1,5 +1,55 @@
 # include "observe.h"
 
+long long combi(int n,int k)
+{
+    long long ans=1;
+    k=k>n-k?n-k:k;
+    int j=1;
+    for(;j<=k;j++,n--)
+    {
+        if(n%j==0)
+        {
+            ans*=n/j;
+        }else
+        if(ans%j==0)
+        {
+            ans=ans/j*n;
+        }else
+        {
+            ans=(ans*n)/j;
+        }
+    }
+    return ans;
+}
+
+float average_syndrom_weight(int n, int w, int t) 
+{
+  double s = 0.0;
+  double c;
+  
+  for (int l=0; l<=t; l++) {
+    if (l%2==1) 
+      {
+	c = combi(w,l);
+	for (int i=1; i<=t-l; i++) 
+	  {
+	    c *= (double) (n-w+1-i) / (n+1-i);
+	  }
+	for (int i=t-l+1; i<=t; i++) 
+	  {
+	    c *= (double) (i) / (n+1-i);
+	  }
+
+	s = s+c;
+      }
+  }
+  s = s*n;
+  
+  return s;
+}
+  
+
+
 // -----------------------------------
 // For some code h, for each possible distance in the spectrum,
 // computes the averaged weight of syndroms of errors containing
@@ -61,7 +111,12 @@ void spectrum_reconstruction(int p, int w, int t, int N, int se, int sh) {
    fclose(fp);  
 
   // call gnuplot
-  system("gnuplot gnuplot-instructions.gnu > ./dat/1.png");
+   float s = average_syndrom_weight(p,w,t);
+   FILE *fpsh;
+   fpsh = fopen("./dat/1.sh", "w+");
+   fprintf(fpsh, "gnuplot -e \"s = %f; mytitle = 'Average syndrom weight per distance (1 block, %d tries)'\" gnuplot-instructions.gnu > ./dat/1.png", s, N);
+   fclose(fpsh);  
+   system("sh ./dat/1.sh");
 }
 
 

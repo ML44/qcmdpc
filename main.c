@@ -50,13 +50,8 @@ int main(int argc, char ** argv) {
   /* printf("lF = %d\n",list_list_length(F)); */
   /* list_list_print(F, "F"); */
 
-
-
-
-
-
-
-
+  spectrum_reconstruction(p, w, t, N, se, sh);
+  
 
 
 
@@ -67,20 +62,20 @@ int main(int argc, char ** argv) {
   /* ********************************************************************* */  
 
 
-  // Creation of the code
-  mysrnd(sh);
-  qcmdpc_t H = qcmdpc_rand(p, w, myrnd);
+  /* // Creation of the code */
+  /* mysrnd(sh); */
+  /* qcmdpc_t H = qcmdpc_rand(p, w, myrnd); */
 
-  // Observe the spectrum
-  float threshold = 138.5; // a fixer comment ?
-  qcsynd_t spectrum = observe_spectrum(H, p, w, t, N, se, threshold);
-  qcblock_print(H, "h");
-  /* qcsynd_print(spectrum,"observed"); */
-  /* printf("%d\n", spectrum->weight); */
-  /* printf("%d\n", spectrum->length); */
+  /* // Observe the spectrum */
+  /* float threshold = 138.5; // a fixer comment ? */
+  /* qcsynd_t spectrum = observe_spectrum(H, p, w, t, N, se, threshold); */
+  /* qcblock_print(H, "h"); */
+  /* /\* qcsynd_print(spectrum,"observed"); *\/ */
+  /* /\* printf("%d\n", spectrum->weight); *\/ */
+  /* /\* printf("%d\n", spectrum->length); *\/ */
 
-  list_list_t candidates = dsr(spectrum, w);
-  list_list_print(candidates, "");
+  /* list_list_t candidates = dsr(spectrum, w); */
+  /* list_list_print(candidates, ""); */
 
   
   return 0;
