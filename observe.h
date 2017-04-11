@@ -1,7 +1,10 @@
 #include "attack.h"
 
-long long combi(int n, int k);
+double lob_binom(int n, int t);
+double log_euh(int n, int w, int t, int i);
+double eff(int n, int w, int t, int b);
 float average_syndrom_weight(int n, int w, int t);
+float sigma(int l, int n, int w, int t);
 
 
 // Spectrum reconstruction

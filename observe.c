@@ -1,51 +1,36 @@
 # include "observe.h"
 
-long long combi(int n,int k)
-{
-    long long ans=1;
-    k=k>n-k?n-k:k;
-    int j=1;
-    for(;j<=k;j++,n--)
-    {
-        if(n%j==0)
-        {
-            ans*=n/j;
-        }else
-        if(ans%j==0)
-        {
-            ans=ans/j*n;
-        }else
-        {
-            ans=(ans*n)/j;
-        }
-    }
-    return ans;
+double log_binom(int n, int t) {
+  if ((t == 0) || (n == t))
+    return 0.0;
+  else
+    return lgamma(n + 1) - lgamma(t + 1) - lgamma(n - t + 1);
 }
+
+double log_euh(int n, int w, int t, int i) {
+	return log_binom(w, i) + log_binom(n - w, t - i) - log_binom(n, t);
+}
+
+double eff(int n, int w, int t, int b) {
+	int i;
+	double x;
+
+	for (x = 0, i = b; /* (i < 10) && */ (i < t); i += 2) {
+		x += exp(log_euh(n, w, t, i));
+	}
+
+	return x;
+}
+
 
 float average_syndrom_weight(int n, int w, int t) 
 {
-  double s = 0.0;
-  double c;
-  
-  for (int l=0; l<=t; l++) {
-    if (l%2==1) 
-      {
-	c = combi(w,l);
-	for (int i=1; i<=t-l; i++) 
-	  {
-	    c *= (double) (n-w+1-i) / (n+1-i);
-	  }
-	for (int i=t-l+1; i<=t; i++) 
-	  {
-	    c *= (double) (i) / (n+1-i);
-	  }
+  return eff(n,w,t,1)*n;
+}
 
-	s = s+c;
-      }
-  }
-  s = s*n;
-  
-  return s;
+float sigma(int l, int n, int w, int t) 
+{
+  return (n-2*w+l)*eff(n-2,w,t-2,1)+2*(w-l)*eff(n-2,w-1,t-2,0)+l*eff(n-2,w-2,t-2,1);
 }
   
 
@@ -114,7 +99,7 @@ void spectrum_reconstruction(int p, int w, int t, int N, int se, int sh) {
    float s = average_syndrom_weight(p,w,t);
    FILE *fpsh;
    fpsh = fopen("./dat/1.sh", "w+");
-   fprintf(fpsh, "gnuplot -e \"s = %f; mytitle = 'Average syndrom weight per distance (1 block, %d tries)'\" gnuplot-instructions.gnu > ./dat/1.png", s, N);
+   fprintf(fpsh, "gnuplot -e \"s = %f; s0 = %f; s1 = %f; s2 = %f; s3 = %f; s4 = %f; mytitle = 'Average syndrom weight per distance (1 block, %d tries)'\" gnuplot-instructions.gnu > ./dat/1.png", s, sigma(0,p,w,t), sigma(1,p,w,t), sigma(2,p,w,t), sigma(3,p,w,t), sigma(4,p,w,t), N);
    fclose(fpsh);  
    system("sh ./dat/1.sh");
 }
