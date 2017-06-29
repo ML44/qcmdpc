@@ -41,9 +41,10 @@ int main(int argc, char ** argv) {
   
   qcblock_t e1 = qcblock_new(p,t);
   qcblock_t e2 = qcblock_new(p,t);
-  qcsynd_t synd_e1 = qcsynd_new(0);
-  qcsynd_t synd_e2 = qcsynd_new(0);
-  qcsynd_t synd_e = qcsynd_new(0);
+  qcsynd_t synd_e1;
+  qcsynd_t synd_e2;
+  qcsynd_t synd_e;
+  
   qcsynd_t spectre_e1 = qcsynd_new(0);
   qcsynd_t spectre_e2 = qcsynd_new(0);
   int sw;
@@ -67,7 +68,7 @@ int main(int argc, char ** argv) {
     e2 = qcblock_rand_noalloc(e2, myrnd);
     se++;
     
-    // Compute the syndrom and its weight
+    // Compute the syndrom and its weight    
     synd_e1 = qcmdpc_synd(qcmdpc_block(H,0), e1);
     synd_e2 = qcmdpc_synd(qcmdpc_block(H,1), e2);
     
@@ -87,8 +88,14 @@ int main(int argc, char ** argv) {
     // Add the weight to the values of the counters that are in the spectrum
     spectrum_add_to_counters(sweight_counter1, dist_freq_counter1, spectre_e1, sw);
     spectrum_add_to_counters(sweight_counter2, dist_freq_counter2, spectre_e2, sw);
-  }
 
+    free(spectre_e1);
+    free(spectre_e2);
+    //  free(sw);
+    
+
+  }
+  
   // compute the ratios
   dist_count_float_t * ratio_counter1 = dist_count_float_new(p/2);
   for (int i=0; i<p/2; i++) {
@@ -103,6 +110,8 @@ int main(int argc, char ** argv) {
       ratio_counter2[i] = sweight_counter2[i];
       ratio_counter2[i] /= dist_freq_counter2[i];
     }
+
+    
   }
 
   // compute the spectrum of h

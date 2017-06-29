@@ -188,11 +188,6 @@ qcsynd_t qcmdpc_synd(qcmdpc_t H, qcblock_t e) {
 	return qcmdpc_synd_adjust(qcsynd_new(vect_length(H)), H, e);
 }
 
-qcsynd_t qcmdpc_synd_noalloc(qcsynd_t s, qcmdpc_t H, qcblock_t e) {
-	return qcmdpc_synd_adjust(s, H, e);
-}
-
-
 
 
 

@@ -43,7 +43,6 @@ qcsynd_t qcsynd_xor(qcsynd_t s1, qcsynd_t s2);
 qcsynd_t qcmdpc_synd_add(qcsynd_t synd, qcblock_t h, int j);
 qcsynd_t qcmdpc_synd_adjust(qcsynd_t synd, qcmdpc_t H, qcblock_t e);
 qcsynd_t qcmdpc_synd(qcmdpc_t H, qcblock_t e);
-qcsynd_t qcmdpc_synd_noalloc(qcsynd_t s, qcmdpc_t H, qcblock_t e);
 
 // counter not likely to be > 255
 typedef uint8_t counter_t;
