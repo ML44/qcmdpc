@@ -172,9 +172,13 @@ def verify(h1, h2, p):
 
 def test(p, w):
     h1 = generate_h(p, w)
+    print(h1)
     s1 = get_spectrum(h1, p)
+    print(s1)
     k2 = reconstruct(s1, w)
+    print(k2)
     h2 = extract(k2)
+    print(h2)
     return(verify(h1, h2, p))
 
 

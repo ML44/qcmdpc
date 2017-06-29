@@ -1,0 +1,1 @@
+gnuplot -e "s = 1918.000000; s0 = 1324.225830; s1 = 1323.277710; s2 = 1322.329590; s3 = 1321.381470; s4 = 1320.433350; mytitle = 'Average syndrom weight per distance (1 block, 100000 tries)'" gnuplot-instructions8-2.gnu > ./dat/8-2.png

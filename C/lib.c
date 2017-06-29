@@ -558,7 +558,17 @@ dense_vect_t dense_vect_copy(dense_vect_t s) {
 	return copy;
 }
 
-
+void dense_vect_xor_noalloc(dense_vect_t s1, dense_vect_t s2, dense_vect_t s) {
+  s->weight = 0;
+  for (int i=0; i<vect_length(s); ++i) 
+    {
+      s->coeff[i] = vect_coeff(s1, i) ^ vect_coeff(s2, i) ;
+      if (vect_coeff(s,i)!=0)
+	{
+	  s->weight +=1;
+	}
+    }
+}
 
 
 

@@ -102,6 +102,7 @@ dense_vect_t dense_vect_new(int length);
 void dense_vect_free(dense_vect_t synd);
 void dense_vect_copy_noalloc(dense_vect_t copy, dense_vect_t s);
 dense_vect_t dense_vect_copy(dense_vect_t s);
+void dense_vect_xor_noalloc(dense_vect_t s1, dense_vect_t s2, dense_vect_t s);
 
 
 /* Some macros on vectors */

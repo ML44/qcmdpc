@@ -61,6 +61,17 @@ qcsynd_t qcsynd_copy(qcsynd_t s) {
   return dense_vect_copy(s);
 }
 
+void qcsynd_xor_noalloc(qcsynd_t s1, qcsynd_t s2, qcsynd_t s) {
+  dense_vect_xor_noalloc(s1, s2, s);
+}
+
+qcsynd_t qcsynd_xor(qcsynd_t s1, qcsynd_t s2) {
+  qcsynd_t s = qcsynd_new(s1->length);
+  dense_vect_xor_noalloc(s1, s2, s);
+  return s;
+}
+
+
 
 
 
@@ -175,6 +186,10 @@ qcsynd_t qcmdpc_synd_adjust(qcsynd_t synd, qcmdpc_t H, qcblock_t e) {
 	 H */
 qcsynd_t qcmdpc_synd(qcmdpc_t H, qcblock_t e) {
 	return qcmdpc_synd_adjust(qcsynd_new(vect_length(H)), H, e);
+}
+
+qcsynd_t qcmdpc_synd_noalloc(qcsynd_t s, qcmdpc_t H, qcblock_t e) {
+	return qcmdpc_synd_adjust(s, H, e);
 }
 
 
