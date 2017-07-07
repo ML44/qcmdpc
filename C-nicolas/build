@@ -1,0 +1,38 @@
+#!/bin/bash
+
+while getopts :p:d:m:vfg name
+do
+    case $name in
+	p)
+	    p="$OPTARG";;
+	d)
+	    d="$OPTARG";;
+	m)
+	    m="$OPTARG";;
+	v)
+	    export verbose=1;;
+	f)
+	    force=1;;
+	g)
+	    export debug=1;;
+    esac
+done
+
+if [ ! $p ] || [ ! $d ]
+then
+    echo "need a block size (-p) and a block weight (-d)"
+    exit
+fi
+
+export block_len=$p
+export block_wgt=$d
+export max_iter=$m
+
+if [ $force ]
+then
+    echo "make clean${p}_$d"
+    make clean${p}_$d
+fi
+
+echo "make qcmdpc${p}_$d"
+make qcmdpc${p}_$d
