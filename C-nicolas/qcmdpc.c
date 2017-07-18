@@ -133,6 +133,33 @@ void make_spectre_of(spectre_t s, qcblock_t e) {
 }
 
 
+compteur_t compteur_new(int length) {
+  compteur_t c = malloc(sizeof (struct compteur));
+
+	int l = (length)/2+1;
+	c->length = l;
+	c->coeff = (int *) calloc(l, sizeof (int));
+
+	return c;
+}
+
+void compteur_free(compteur_t c) {
+	free(c->coeff);
+	free(c);
+}
+
+void compteur_add_spectrum(compteur_t c, spectre_t s, int n) {
+  for (int i = 0; i < spectre_length(s); ++i)
+    {
+      if(spectre_coeff(s, i)) 
+	{
+	  compteur_add_coeff(c, i, n);	  
+	}
+    }
+}
+
+
+
 
 /* allocate a new qcblock_t to contain the t indices in v[]. */
 qcblock_t qcblock_from_indexarray(index_t * v, int length, int weight) {

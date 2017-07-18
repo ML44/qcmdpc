@@ -44,6 +44,15 @@ struct spectre {
 typedef struct spectre * spectre_t;
 
 
+// table to count iterations
+struct compteur {
+	int length;
+	int * coeff;
+};
+
+typedef struct compteur * compteur_t;
+
+
 
 #define qcblock_weight(h) ((h)->weight)
 #define qcblock_length(h) ((h)->length)
@@ -61,6 +70,10 @@ typedef struct spectre * spectre_t;
 #define spectre_coeff(s, i) ((s)->coeff[i])
 #define spectre_set_coeff(s, i, b) ((s)->coeff[i] = b)
 #define spectre_length(s) ((s)->length)
+
+#define compteur_coeff(c, i) ((c)->coeff[i])
+#define compteur_add_coeff(c, i, n) ((c)->coeff[i] += n)
+#define compteur_length(s) ((c)->length)
 
 qcblock_t qcblock_new(int length, int weight);
 void qcblock_free(qcblock_t h);
@@ -81,6 +94,10 @@ qcsynd_t qcsynd_copy_alloc(qcsynd_t s);
 spectre_t spectre_new(int length);
 void make_spectre_of(spectre_t s, qcblock_t e);
 void spectre_free(spectre_t s);
+
+compteur_t compteur_new(int length);
+void compteur_add_spectrum(compteur_t c, spectre_t s, int n);
+void compteur_free(compteur_t c);
 
 qcmdpc_t qcmdpc_new();
 void qcmdpc_free(qcmdpc_t h);
