@@ -13,6 +13,8 @@ int main(int argc, char ** argv) {
 	int t, se, sH, arg_count, r, i;
 	qcmdpc_t H;
 	qcblock_t e;
+	spectre_t s;
+	//  counter_t counter;
 	int stat_iter[MAX_ITER + 1];
 
 	arg_count = 0;
@@ -28,6 +30,10 @@ int main(int argc, char ** argv) {
 		stat_iter[i] = 0;
 	}
 
+	s = spectre_new(BLOCK_LENGTH);
+	
+	// TODO : initialize counter to 0
+	
 	while (r--) {
 #ifdef VERBOSE
 		printf("#%d,%d %d %d %d ", sH, se, BLOCK_LENGTH, BLOCK_WEIGHT, t);
@@ -37,6 +43,24 @@ int main(int argc, char ** argv) {
 		i = qcmdpc_decode(H, e);
 		stat_iter[i]++;
 
+		make_spectre_of(s,e);
+		//		add_to_counter(se,i); // TODO
+
+		printf("e = ");
+		for(int i=0; (i<qcblock_weight(e)-1) & (qcblock_index(e,i) < BLOCK_LENGTH); ++i)
+		  {
+		    printf("%d ; ", qcblock_index(e,i));
+		  }
+		printf("\n");
+
+		printf("s = ");
+		for(int k=0; k<spectre_length(s); ++k) 
+		  {
+		    printf("%d ; ", spectre_coeff(s,k));
+		  }
+		printf("\n");
+		
+		
 		qcblock_free(e);
 
 #ifdef VERBOSE
@@ -46,6 +70,8 @@ int main(int argc, char ** argv) {
 		se++;
 	}
 	qcmdpc_free(H);
+	//	spectre_free(s);
+	
 
 #ifndef VERBOSE
 	for (i = 1; i <= MAX_ITER; ++i) {

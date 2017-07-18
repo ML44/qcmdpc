@@ -96,6 +96,44 @@ qcsynd_t qcsynd_copy_alloc(qcsynd_t s) {
 	return copy;
 }
 
+
+spectre_t spectre_new(int length) {
+	spectre_t s = malloc(sizeof (struct spectre));
+
+	int l = (length)/2+1;
+	s->length = l;
+	s->coeff = (char *) calloc(l, sizeof (char));
+
+	return s;
+}
+
+void spectre_free(spectre_t s) {
+	free(s->coeff);
+	free(s);
+}
+
+void make_spectre_of(spectre_t s, qcblock_t e) {
+  for (int i=0; i<spectre_length(s); ++i) 
+    {
+      spectre_set_coeff(s,i,0);
+    } 
+  
+  int p = BLOCK_LENGTH;
+  int w = qcblock_weight(e);
+  int i, j, d1, d2, d;
+  
+  for (i=0; (i<w-1) & (qcblock_index(e,i) < BLOCK_LENGTH); ++i) {
+    for (j=i+1; (j<w) & (qcblock_index(e,j) < BLOCK_LENGTH); ++j) {
+      d1 = qcblock_index(e,j) - qcblock_index(e,i);
+      d2 = p - d1;
+      d = d1>=d2?d2:d1 ;		
+      spectre_set_coeff(s,d,1);
+    }
+  }
+}
+
+
+
 /* allocate a new qcblock_t to contain the t indices in v[]. */
 qcblock_t qcblock_from_indexarray(index_t * v, int length, int weight) {
 	qcblock_t h = qcblock_new(length, weight);

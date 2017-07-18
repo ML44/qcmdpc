@@ -35,6 +35,16 @@ struct qcsynd {
 typedef struct qcsynd * qcsynd_t;
 
 
+// dense representation for spectrum
+struct spectre {
+	int length;
+	char * coeff;
+};
+
+typedef struct spectre * spectre_t;
+
+
+
 #define qcblock_weight(h) ((h)->weight)
 #define qcblock_length(h) ((h)->length)
 #define qcblock_index(h, i) ((h)->index[i])
@@ -47,6 +57,10 @@ typedef struct qcsynd * qcsynd_t;
 #define qcsynd_flip_coeff(synd, i) ((synd)->coeff[i] ^= 1)
 #define qcsynd_weight(synd) ((synd)->weight)
 #define qcsynd_length(synd) ((synd)->length)
+
+#define spectre_coeff(s, i) ((s)->coeff[i])
+#define spectre_set_coeff(s, i, b) ((s)->coeff[i] = b)
+#define spectre_length(s) ((s)->length)
 
 qcblock_t qcblock_new(int length, int weight);
 void qcblock_free(qcblock_t h);
@@ -63,6 +77,10 @@ qcsynd_t qcsynd_new(int length);
 void qcsynd_free(qcsynd_t synd);
 void qcsynd_copy(qcsynd_t copy, qcsynd_t s);
 qcsynd_t qcsynd_copy_alloc(qcsynd_t s);
+
+spectre_t spectre_new(int length);
+void make_spectre_of(spectre_t s, qcblock_t e);
+void spectre_free(spectre_t s);
 
 qcmdpc_t qcmdpc_new();
 void qcmdpc_free(qcmdpc_t h);
