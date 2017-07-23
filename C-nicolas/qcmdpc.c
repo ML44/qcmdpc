@@ -121,13 +121,16 @@ void make_spectre_of(spectre_t s, qcblock_t e) {
   int p = BLOCK_LENGTH;
   int w = qcblock_weight(e);
   int i, j, d1, d2, d;
+  char b;
   
   for (i=0; (i<w-1) & (qcblock_index(e,i) < BLOCK_LENGTH); ++i) {
     for (j=i+1; (j<w) & (qcblock_index(e,j) < BLOCK_LENGTH); ++j) {
       d1 = qcblock_index(e,j) - qcblock_index(e,i);
       d2 = p - d1;
       d = d1>=d2?d2:d1 ;		
-      spectre_set_coeff(s,d,1);
+      b = spectre_coeff(s,d);
+      b = b<4?b+1:4;
+      spectre_set_coeff(s,d,b);
     }
   }
 }
