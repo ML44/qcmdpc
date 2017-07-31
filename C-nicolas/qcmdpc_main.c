@@ -20,10 +20,10 @@ int main(int argc, char ** argv) {
 	arg_count = 0;
 	t = atoi(argv[++arg_count]);
 	r = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
-	sH = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
 	se = (argc > arg_count + 1) ? atoi(argv[++arg_count]) : 1;
-
 	N = r;
+	sH = se + N;
+
 
 	for (i = 0; i <= MAX_ITER; ++i) {
 		stat_iter[i] = 0;
@@ -69,7 +69,7 @@ int main(int argc, char ** argv) {
 #endif
 
 		se++;
-		sH+=2;
+		sH++;
 		
 	}
 	
@@ -82,11 +82,15 @@ int main(int argc, char ** argv) {
   	  compteur_coeff(ctot, i) += 1;
   	}
     }
-    
+
+  se -= N;
+  sH -= N;
   
   FILE *fp;
-  fp = fopen("./out.dat", "w+");
-  fprintf(fp, "#Nombre d'essais = %d, \n#Poids de l'erreur = %d, \n#Taille d'un bloc = %d, \n#Poids de h = %d. \n", N, t, BLOCK_LENGTH, BLOCK_WEIGHT);
+  char fichier[128] = "";
+  snprintf(fichier, sizeof fichier, "./out_%d.dat", se);
+  fp = fopen(fichier, "w+");
+  fprintf(fp, "#Nombre d'essais = %d, \n#Poids de l'erreur = %d, \n#Taille d'un bloc = %d, \n#Poids de h = %d,\n#se = %d,\n#sH = %d. \n", N, t, BLOCK_LENGTH, BLOCK_WEIGHT, se, sH);
   for (int i=0; i<spectre_length(s); i++) {
     fprintf(fp, "%d \t %f \t %d \n", i, (double) compteur_coeff(c,i) / ( (double)  compteur_coeff(ctot,i)), compteur_coeff(ctot,i));
   }
